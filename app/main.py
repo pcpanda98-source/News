@@ -6,7 +6,7 @@ from app.controllers.admin_controller import admin_bp
 from app.controllers.api_controller import api_bp
 import os
 
-def create_app():
+def create_app():    
     template_dir = os.path.join(os.path.dirname(__file__), 'templates')
     static_dir = os.path.join(os.path.dirname(__file__), '..', 'static')
     app = Flask(__name__, static_folder=static_dir, template_folder=template_dir)

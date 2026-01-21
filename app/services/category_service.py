@@ -5,7 +5,7 @@ def list_categories():
     return Category.query.order_by(Category.name).all()
 
 def get_category(cat_id):
-    return Category.query.get(cat_id)
+    return db.session.get(Category, cat_id)
 
 def create_category(name):
     c = Category(name=name)
