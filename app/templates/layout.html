@@ -24,18 +24,46 @@
                 </div>
 
                 <!-- Desktop Navigation -->
-                <div class="hidden md:flex items-center space-x-8">
+                <div class="hidden md:flex items-center space-x-6">
                     <a href="/" class="hover:text-blue-400 transition duration-200">Home</a>
                     <a href="/live" class="text-red-400 font-semibold hover:text-red-300 transition duration-200 flex items-center gap-1">🔴 Live News</a>
                     <a href="/articles" class="hover:text-blue-400 transition duration-200">Articles</a>
                     <a href="/categories" class="hover:text-blue-400 transition duration-200">Categories</a>
+                    
                     <a href="/articles/create" class="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200">Create Article</a>
                     <a href="/manage" class="bg-purple-600 px-4 py-2 rounded-lg hover:bg-purple-700 transition duration-200">Manage News</a>
                     <a href="/categories/manage" class="bg-green-600 px-4 py-2 rounded-lg hover:bg-green-700 transition duration-200">Manage Categories</a>
+                    <a href="/media/manage" class="bg-orange-600 px-4 py-2 rounded-lg hover:bg-orange-700 transition duration-200">Manage Media</a>
+                    
+                    <!-- Theme Toggle Button at far right corner -->
+                    <button 
+                        onclick="toggleTheme()" 
+                        class="theme-toggle p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-yellow-400 transition duration-200 flex items-center justify-center ml-2"
+                        title="Toggle Dark/Light Mode"
+                    >
+                        <span class="theme-icon">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                            </svg>
+                        </span>
+                    </button>
                 </div>
 
                 <!-- Mobile Menu Button -->
-                <div class="md:hidden">
+                <div class="md:hidden flex items-center">
+                    <!-- Theme Toggle Button for mobile -->
+                    <button 
+                        onclick="toggleTheme()" 
+                        class="theme-toggle p-2 rounded-lg bg-gray-700 hover:bg-gray-600 text-yellow-400 transition duration-200 flex items-center justify-center mr-2"
+                        title="Toggle Dark/Light Mode"
+                    >
+                        <span class="theme-icon">
+                            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                            </svg>
+                        </span>
+                    </button>
+                    
                     <button id="menuBtn" class="text-gray-300 hover:text-white focus:outline-none">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path>
@@ -50,9 +78,24 @@
                 <a href="/live" class="block px-3 py-2 rounded-md bg-red-600 hover:bg-red-700 font-semibold">🔴 Live News</a>
                 <a href="/articles" class="block px-3 py-2 rounded-md hover:bg-gray-700">Articles</a>
                 <a href="/categories" class="block px-3 py-2 rounded-md hover:bg-gray-700">Categories</a>
+                
+                <!-- Mobile Theme Toggle -->
+                <button 
+                    onclick="toggleTheme()" 
+                    class="w-full theme-toggle flex items-center space-x-2 px-3 py-2 rounded-md bg-gray-700 hover:bg-gray-600 text-yellow-400"
+                >
+                    <span class="theme-icon">
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                        </svg>
+                    </span>
+                    <span class="font-semibold">Toggle Theme</span>
+                </button>
+                
                 <a href="/articles/create" class="block px-3 py-2 rounded-md bg-blue-600 hover:bg-blue-700">Create Article</a>
                 <a href="/manage" class="block px-3 py-2 rounded-md bg-purple-600 hover:bg-purple-700">Manage News</a>
                 <a href="/categories/manage" class="block px-3 py-2 rounded-md bg-green-600 hover:bg-green-700">Manage Categories</a>
+                <a href="/media/manage" class="block px-3 py-2 rounded-md bg-orange-600 hover:bg-orange-700">Manage Media</a>
             </div>
         </div>
     </nav>
@@ -85,11 +128,6 @@
                         <li><a href="/categories/manage" class="hover:text-white">Manage Categories</a></li>
                     </ul>
                 </div>
-                <div>
-                    <h4 class="text-sm font-bold mb-4">Contact</h4>
-                    <p class="text-gray-400 text-sm">Email: info@newshub.com</p>
-                    <p class="text-gray-400 text-sm">Phone: +1 (555) 123-4567</p>
-                </div>
             </div>
             <div class="border-t border-gray-800 mt-8 pt-8 text-center text-gray-400 text-sm">
                 <p>&copy; 2026 NewsHub. All rights reserved.</p>
@@ -98,6 +136,38 @@
     </footer>
 
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    
+    <!-- Theme Initialization Script - Prevents flash of wrong theme -->
+    <script>
+        (function() {
+            const themeKey = 'newshub-theme';
+            const darkClass = 'dark';
+            
+            function getSystemPreference() {
+                if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+                    return 'dark';
+                }
+                return 'light';
+            }
+            
+            function getSavedTheme() {
+                const saved = localStorage.getItem(themeKey);
+                return saved || getSystemPreference();
+            }
+            
+            function applyTheme(theme) {
+                if (theme === 'dark') {
+                    document.documentElement.classList.add(darkClass);
+                } else {
+                    document.documentElement.classList.remove(darkClass);
+                }
+            }
+            
+            // Apply theme immediately
+            applyTheme(getSavedTheme());
+        })();
+    </script>
+    
     {% block scripts %}{% endblock %}
 </body>
 </html>

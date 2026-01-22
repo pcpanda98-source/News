@@ -4,6 +4,7 @@ from app.controllers.article_controller import article_bp
 from app.controllers.category_controller import category_bp
 from app.controllers.admin_controller import admin_bp
 from app.controllers.api_controller import api_bp
+from app.controllers.media_controller import media_bp
 import os
 
 def create_app():
@@ -22,6 +23,7 @@ def create_app():
     app.register_blueprint(category_bp)
     app.register_blueprint(admin_bp)
     app.register_blueprint(api_bp, url_prefix='/api')
+    app.register_blueprint(media_bp)
 
     return app
 

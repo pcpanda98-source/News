@@ -1,7 +1,82 @@
 // NewsHub - Main JavaScript File
 
+// Theme Management
+const ThemeManager = (function() {
+    const THEME_KEY = 'newshub-theme';
+    const DARK_CLASS = 'dark';
+
+    function getSystemPreference() {
+        if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            return 'dark';
+        }
+        return 'light';
+    }
+
+    function getSavedTheme() {
+        const saved = localStorage.getItem(THEME_KEY);
+        return saved || getSystemPreference();
+    }
+
+    function setTheme(theme) {
+        const html = document.documentElement;
+        if (theme === 'dark') {
+            html.classList.add(DARK_CLASS);
+        } else {
+            html.classList.remove(DARK_CLASS);
+        }
+        localStorage.setItem(THEME_KEY, theme);
+        updateThemeIcon(theme);
+    }
+
+    function toggleTheme() {
+        const currentTheme = getSavedTheme();
+        const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+        setTheme(newTheme);
+        return newTheme;
+    }
+
+    function getCurrentTheme() {
+        return document.documentElement.classList.contains(DARK_CLASS) ? 'dark' : 'light';
+    }
+
+    function updateThemeIcon(theme) {
+        const themeIcons = document.querySelectorAll('.theme-icon');
+        themeIcons.forEach(icon => {
+            if (theme === 'dark') {
+                icon.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z" fill-rule="evenodd" clip-rule="evenodd"></path></svg>';
+            } else {
+                icon.innerHTML = '<svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20"><path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path></svg>';
+            }
+        });
+    }
+
+    function init() {
+        const theme = getSavedTheme();
+        setTheme(theme);
+
+        // Listen for system theme changes
+        if (window.matchMedia) {
+            window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function(e) {
+                if (!localStorage.getItem(THEME_KEY)) {
+                    setTheme(e.matches ? 'dark' : 'light');
+                }
+            });
+        }
+    }
+
+    return {
+        init: init,
+        toggle: toggleTheme,
+        set: setTheme,
+        get: getCurrentTheme
+    };
+})();
+
 // Mobile Menu Toggle
 document.addEventListener('DOMContentLoaded', function() {
+    // Initialize theme
+    ThemeManager.init();
+
     const menuBtn = document.getElementById('menuBtn');
     const mobileMenu = document.getElementById('mobileMenu');
 
@@ -30,6 +105,15 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Global theme toggle function
+window.toggleTheme = function() {
+    const newTheme = ThemeManager.toggle();
+    showNotification(`Switched to ${newTheme} mode`, 'info');
+};
+
+// Initialize theme on page load
+document.addEventListener('DOMContentLoaded', ThemeManager.init);
 
 // Utility Functions
 

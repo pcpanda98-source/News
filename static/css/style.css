@@ -1,6 +1,141 @@
 /* Custom Tailwind CSS Extensions */
 
-/* Smooth transitions */
+/* ==================== CSS Custom Properties for Theming ==================== */
+:root {
+    /* Light Theme (Default) */
+    --bg-primary: #ffffff;
+    --bg-secondary: #f9fafb;
+    --bg-tertiary: #f3f4f6;
+    --text-primary: #111827;
+    --text-secondary: #4b5563;
+    --text-muted: #9ca3af;
+    --border-color: #e5e7eb;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+    --card-bg: #ffffff;
+    --input-bg: #ffffff;
+    --nav-bg: #111827;
+    --footer-bg: #111827;
+    --overlay-bg: rgba(0, 0, 0, 0.5);
+}
+
+.dark {
+    /* Dark Theme */
+    --bg-primary: #1f2937;
+    --bg-secondary: #111827;
+    --bg-tertiary: #374151;
+    --text-primary: #f9fafb;
+    --text-secondary: #d1d5db;
+    --text-muted: #9ca3af;
+    --border-color: #4b5563;
+    --shadow-color: rgba(0, 0, 0, 0.3);
+    --card-bg: #1f2937;
+    --input-bg: #374151;
+    --nav-bg: #030712;
+    --footer-bg: #030712;
+    --overlay-bg: rgba(0, 0, 0, 0.7);
+}
+
+/* Apply CSS custom properties to body */
+body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Dark mode element styles */
+.dark body {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+.dark .bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+.dark .bg-gray-50 {
+    background-color: var(--bg-secondary) !important;
+}
+
+.dark .bg-gray-100 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark .text-gray-900 {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-800 {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-700 {
+    color: var(--text-secondary) !important;
+}
+
+.dark .text-gray-600 {
+    color: var(--text-secondary) !important;
+}
+
+.dark .text-gray-500 {
+    color: var(--text-muted) !important;
+}
+
+.dark .text-gray-400 {
+    color: var(--text-muted) !important;
+}
+
+.dark .border-gray-200 {
+    border-color: var(--border-color) !important;
+}
+
+.dark .border-gray-300 {
+    border-color: var(--border-color) !important;
+}
+
+.dark .shadow-md {
+    box-shadow: 0 4px 6px -1px var(--shadow-color) !important;
+}
+
+.dark .shadow-lg {
+    box-shadow: 0 10px 15px -3px var(--shadow-color) !important;
+}
+
+/* Form elements in dark mode */
+.dark input,
+.dark textarea,
+.dark select {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Table styles in dark mode */
+.dark table {
+    color: var(--text-primary);
+}
+
+.dark thead {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark tbody tr {
+    border-color: var(--border-color);
+}
+
+.dark tbody tr:hover {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Modal styles in dark mode */
+.dark .bg-white.rounded-lg {
+    background-color: var(--card-bg) !important;
+}
+
+/* ==================== Smooth Transitions ==================== */
 * {
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
@@ -87,7 +222,7 @@ button:active {
 }
 
 ::-webkit-scrollbar-track {
-    background: #f1f1f1;
+    background: var(--bg-tertiary);
 }
 
 ::-webkit-scrollbar-thumb {
@@ -97,4 +232,317 @@ button:active {
 
 ::-webkit-scrollbar-thumb:hover {
     background: #555;
+}
+
+/* Dark mode scrollbar */
+.dark ::-webkit-scrollbar-track {
+    background: var(--bg-tertiary);
+}
+
+.dark ::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
+}
+
+/* Theme transition animation */
+@keyframes themeFade {
+    from { opacity: 0.9; }
+    to { opacity: 1; }
+}
+
+body {
+    animation: themeFade 0.3s ease-out;
+}
+
+/* Notification toast dark mode */
+.dark .fixed.bottom-4.right-4.px-6.py-3.rounded-lg.font-semibold.text-white {
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* ==================== Page-Specific Dark Mode Styles ==================== */
+
+/* Hero section gradients */
+.dark .bg-gradient-to-r {
+    background: linear-gradient(to right, #374151, #1f2937) !important;
+}
+
+/* Category gradient cards */
+.dark .bg-gradient-to-r.from-purple-400 {
+    background: linear-gradient(to right, #4b5563, #374151) !important;
+}
+
+/* Blue gradient backgrounds */
+.dark .bg-gradient-to-r.from-blue-400,
+.dark .bg-gradient-to-r.from-blue-500,
+.dark .bg-gradient-to-r.from-blue-600 {
+    background: linear-gradient(to right, #374151, #1f2937) !important;
+}
+
+/* Live news red elements */
+.dark .bg-red-100 {
+    background-color: rgba(220, 38, 38, 0.2) !important;
+}
+
+.dark .text-red-800 {
+    color: #fca5a5 !important;
+}
+
+.dark .bg-red-600 {
+    background-color: #dc2626 !important;
+}
+
+/* Badge styles */
+.dark .bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.dark .text-blue-800 {
+    color: #93c5fd !important;
+}
+
+.dark .bg-purple-100 {
+    background-color: rgba(147, 51, 234, 0.2) !important;
+}
+
+.dark .text-purple-800 {
+    color: #c4b5fd !important;
+}
+
+.dark .bg-green-100 {
+    background-color: rgba(34, 197, 94, 0.2) !important;
+}
+
+.dark .text-green-800 {
+    color: #86efac !important;
+}
+
+.dark .bg-yellow-100 {
+    background-color: rgba(234, 179, 8, 0.2) !important;
+}
+
+.dark .text-yellow-800 {
+    color: #fde047 !important;
+}
+
+/* Modal overlay */
+.dark #editModal {
+    background-color: rgba(0, 0, 0, 0.7);
+}
+
+.dark #editModal .bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+/* Empty state backgrounds */
+.dark .bg-gray-100.rounded-lg.p-12.text-center,
+.dark .bg-gray-100.rounded-lg.p-8.text-center {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Info sections */
+.dark .bg-blue-50 {
+    background-color: rgba(59, 130, 246, 0.1) !important;
+}
+
+.dark .bg-green-50 {
+    background-color: rgba(34, 197, 94, 0.1) !important;
+}
+
+.dark .bg-blue-50.rounded-lg,
+.dark .bg-green-50.rounded-lg {
+    border-color: var(--border-color) !important;
+}
+
+/* Button backgrounds in dark mode */
+.dark .bg-gray-200 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark .text-gray-800 {
+    color: var(--text-primary) !important;
+}
+
+/* Link hover states */
+.dark a.text-blue-600,
+.dark a.text-blue-800 {
+    color: #60a5fa !important;
+}
+
+.dark a.text-blue-600:hover,
+.dark a.text-blue-800:hover {
+    color: #93c5fd !important;
+}
+
+.dark a.text-purple-600 {
+    color: #a78bfa !important;
+}
+
+.dark a.text-purple-600:hover {
+    color: #c4b5fd !important;
+}
+
+.dark a.text-green-600 {
+    color: #4ade80 !important;
+}
+
+.dark a.text-green-600:hover {
+    color: #86efac !important;
+}
+
+/* Loading spinner dark mode */
+.dark .animate-spin {
+    border-color: rgba(255, 255, 255, 0.3);
+    border-top-color: #ef4444;
+}
+
+/* Error message styling */
+.dark #errorMessage {
+    background-color: rgba(127, 29, 29, 0.3);
+    border-color: #dc2626;
+}
+
+.dark #errorMessage .text-red-700 {
+    color: #fca5a5 !important;
+}
+
+.dark #errorMessage .text-red-600 {
+    color: #f87171 !important;
+}
+
+/* Stats section cards */
+.dark .text-blue-600 {
+    color: #60a5fa !important;
+}
+
+.dark .text-green-600 {
+    color: #4ade80 !important;
+}
+
+.dark .text-purple-600 {
+    color: #a78bfa !important;
+}
+
+/* Article image placeholder backgrounds */
+.dark .bg-gradient-to-r.from-blue-400 {
+    background: linear-gradient(to right, #4b5563, #374151) !important;
+}
+
+/* Form labels */
+.dark label {
+    color: var(--text-primary) !important;
+}
+
+/* Character count text */
+.dark #charCount,
+.dark #wordCount,
+.dark #editCharCount {
+    color: var(--text-muted) !important;
+}
+
+/* Preview section */
+.dark #preview {
+    background-color: var(--bg-secondary) !important;
+    border-color: var(--border-color) !important;
+}
+
+/* Search and filter inputs */
+.dark input::placeholder,
+.dark textarea::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Sort and filter selects */
+.dark select option {
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+}
+
+/* Quick stats section */
+.dark .text-blue-600,
+.dark .text-green-600,
+.dark .text-purple-600 {
+    color: #60a5fa !important;
+}
+
+/* About section in categories page */
+.dark .bg-white.rounded-lg.shadow-md.p-8 {
+    background-color: var(--card-bg) !important;
+}
+
+/* Related articles section */
+.dark .bg-white.rounded-lg.shadow-md.p-6 {
+    background-color: var(--card-bg) !important;
+}
+
+/* ==================== Navigation Dark Mode Styles ==================== */
+
+/* Mobile menu button */
+.dark #menuBtn {
+    color: var(--text-muted);
+}
+
+.dark #menuBtn:hover {
+    color: var(--text-primary);
+}
+
+/* Navigation text colors in dark mode */
+.dark nav a {
+    color: var(--text-secondary);
+}
+
+.dark nav a:hover {
+    color: var(--text-primary);
+}
+
+/* Navigation hover states */
+.dark nav a.text-blue-400:hover,
+.dark nav a:hover:text-blue-400 {
+    color: #60a5fa !important;
+}
+
+.dark nav a.text-red-400 {
+    color: #f87171 !important;
+}
+
+.dark nav a.text-red-400:hover {
+    color: #fca5a5 !important;
+}
+
+/* Theme toggle button in dark mode */
+.dark .theme-toggle {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark .theme-toggle:hover {
+    background-color: var(--border-color) !important;
+}
+
+/* Footer links in dark mode */
+.dark footer a {
+    color: var(--text-secondary);
+}
+
+.dark footer a:hover {
+    color: var(--text-primary);
+}
+
+.dark footer h3,
+.dark footer h4 {
+    color: var(--text-primary);
+}
+
+.dark footer p {
+    color: var(--text-secondary);
+}
+
+/* ==================== Scrollbar Thumb Dark Mode Fix ==================== */
+.dark ::-webkit-scrollbar-thumb {
+    background: #6b7280;
+}
+
+.dark ::-webkit-scrollbar-thumb:hover {
+    background: #9ca3af;
 }

@@ -6,6 +6,7 @@ class Article(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     title = db.Column(db.String(255), nullable=False)
     content = db.Column(db.Text, nullable=False)
+    image_url = db.Column(db.String(500), nullable=True)
     category_id = db.Column(db.Integer, db.ForeignKey('categories.id'), nullable=True)
     created_at = db.Column(db.DateTime, default=lambda: datetime.now(timezone.utc))
 
@@ -16,6 +17,7 @@ class Article(db.Model):
             'id': self.id,
             'title': self.title,
             'content': self.content,
+            'image_url': self.image_url,
             'category_id': self.category_id,
             'created_at': self.created_at.isoformat()
         }
