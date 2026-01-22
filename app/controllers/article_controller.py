@@ -19,6 +19,12 @@ def articles_page():
     return render_template('articles.html', articles=articles)
 
 
+@article_bp.route('/live')
+def live_news():
+    news_api_key = 'pub_b6ea65c0579b42b5a8f61d11f2eac14f'
+    return render_template('live_news.html', news_api_key=news_api_key)
+
+
 @article_bp.route('/articles/create', methods=['GET', 'POST'])
 def create_article_page():
     categories = list_categories()
@@ -37,6 +43,13 @@ def article_detail(article_id):
     if not a:
         return 'Not found', 404
     return render_template('article_detail.html', article=a)
+
+
+@article_bp.route('/manage')
+def manage_articles():
+    articles = list_articles()
+    categories = list_categories()
+    return render_template('manage_articles.html', articles=articles, categories=categories)
 
 
 @article_bp.route('/api/articles')

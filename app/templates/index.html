@@ -1,32 +1,110 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block title %}Home - NewsHub{% endblock %}
+
 {% block content %}
-<section>
-  <h2>Live Headlines</h2>
-  <div id="live-news"></div>
+<!-- Hero Section -->
+<div class="bg-gradient-to-r from-blue-600 to-blue-800 text-white rounded-lg shadow-lg mb-12 overflow-hidden">
+    <div class="px-6 py-12 md:py-16">
+        <h1 class="text-4xl md:text-5xl font-bold mb-4">Welcome to NewsHub</h1>
+        <p class="text-xl text-blue-100 mb-8">Discover the latest news and articles from around the world</p>
+        <div class="flex flex-col sm:flex-row gap-4">
+            <a href="/articles" class="bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition duration-200 inline-block text-center">
+                Browse Articles
+            </a>
+            <a href="/articles/create" class="bg-blue-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-400 transition duration-200 inline-block text-center">
+                Create Article
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Categories Section -->
+{% if categories %}
+<section class="mb-12">
+    <h2 class="text-3xl font-bold mb-6">Categories</h2>
+    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+        {% for category in categories %}
+        <a href="/articles?category={{ category.id }}" class="bg-white p-4 rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition duration-200 text-center">
+            <div class="text-2xl mb-2">📰</div>
+            <h3 class="font-semibold text-gray-800 truncate">{{ category.name }}</h3>
+            <p class="text-sm text-gray-500 mt-2">Explore</p>
+        </a>
+        {% endfor %}
+    </div>
+    <div class="text-center mt-6">
+        <a href="/categories" class="text-blue-600 hover:text-blue-800 font-semibold">View All Categories →</a>
+    </div>
 </section>
-<section>
-  <h2>Internal Articles</h2>
-  <ul>
-  {% for a in articles %}
-    <li><a href="/articles/{{a.id}}">{{ a.title }}</a> - {{ a.created_at.strftime('%Y-%m-%d') }}</li>
-  {% endfor %}
-  </ul>
+{% endif %}
+
+<!-- Featured Articles Section -->
+<section class="mb-12">
+    <h2 class="text-3xl font-bold mb-6">Latest Articles</h2>
+    
+    {% if articles %}
+    <div class="space-y-6">
+        {% for article in articles[:3] %}
+        <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden">
+            <div class="p-6">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="text-2xl font-bold text-gray-900">
+                        <a href="/articles/{{ article.id }}" class="hover:text-blue-600 transition duration-200">
+                            {{ article.title }}
+                        </a>
+                    </h3>
+                    {% if article.category %}
+                    <span class="bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold">
+                        {{ article.category.name }}
+                    </span>
+                    {% endif %}
+                </div>
+                <p class="text-gray-600 mb-4 line-clamp-3">{{ article.content[:200] }}...</p>
+                <div class="flex items-center justify-between">
+                    <span class="text-sm text-gray-500">
+                        📅 {{ article.created_at.strftime('%B %d, %Y') if article.created_at else 'Recently' }}
+                    </span>
+                    <a href="/articles/{{ article.id }}" class="text-blue-600 font-semibold hover:text-blue-800 transition duration-200">
+                        Read More →
+                    </a>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+    
+    <div class="text-center mt-8">
+        <a href="/articles" class="bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block">
+            View All Articles
+        </a>
+    </div>
+    {% else %}
+    <div class="bg-gray-100 rounded-lg p-8 text-center">
+        <p class="text-gray-600 text-lg mb-4">No articles available yet.</p>
+        <a href="/articles/create" class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block">
+            Create the First Article
+        </a>
+    </div>
+    {% endif %}
 </section>
 
-<script>
-fetch('/api/live')
-  .then(r=>r.json())
-  .then(data=>{
-    const container = document.getElementById('live-news');
-    if(!data.articles) { container.innerText = 'No data'; return }
-    data.articles.slice(0,8).forEach(item=>{
-      const d = document.createElement('div');
-      d.className = 'live-item';
-      d.innerHTML = `<h3><a target="_blank" href="${item.url}">${item.title}</a></h3><p>${item.description||''}</p>`;
-      container.appendChild(d);
-    })
-  })
-  .catch(err=>{ document.getElementById('live-news').innerText = 'Error loading live news'; })
-</script>
+<!-- Quick Stats -->
+<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-blue-600 mb-2">{{ articles|length }}</div>
+        <p class="text-gray-600">Total Articles</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-green-600 mb-2">{{ categories|length }}</div>
+        <p class="text-gray-600">Categories</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-purple-600 mb-2">✨</div>
+        <p class="text-gray-600">Always Fresh Content</p>
+    </div>
+</section>
+{% endblock %}
 
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
 {% endblock %}

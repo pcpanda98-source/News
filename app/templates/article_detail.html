@@ -1,8 +1,100 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block title %}{{ article.title }} - NewsHub{% endblock %}
+
 {% block content %}
-<article>
-  <h2>{{ article.title }}</h2>
-  <p><em>Category: {{ article.category.name if article.category else '—' }}</em></p>
-  <div>{{ article.content }}</div>
-</article>
+<div class="max-w-3xl mx-auto">
+    <!-- Back Button -->
+    <a href="/articles" class="text-blue-600 hover:text-blue-800 font-semibold mb-6 inline-flex items-center">
+        ← Back to Articles
+    </a>
+
+    <!-- Article Header -->
+    <article class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <!-- Hero Image -->
+        <div class="bg-gradient-to-r from-blue-500 to-blue-700 h-64 flex items-center justify-center">
+            <span class="text-8xl">📰</span>
+        </div>
+
+        <!-- Article Content -->
+        <div class="p-8">
+            <!-- Article Meta -->
+            <div class="flex items-center justify-between mb-6 flex-wrap gap-4">
+                <div>
+                    <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ article.title }}</h1>
+                    <div class="flex items-center space-x-4 text-gray-600">
+                        <span class="flex items-center space-x-2">
+                            <span>📅</span>
+                            <span>{{ article.created_at.strftime('%B %d, %Y') if article.created_at else 'Recently' }}</span>
+                        </span>
+                        {% if article.updated_at %}
+                        <span class="flex items-center space-x-2">
+                            <span>✏️</span>
+                            <span>Updated: {{ article.updated_at.strftime('%B %d, %Y') }}</span>
+                        </span>
+                        {% endif %}
+                    </div>
+                </div>
+                {% if article.category %}
+                <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold">
+                    {{ article.category.name }}
+                </div>
+                {% endif %}
+            </div>
+
+            <!-- Article Body -->
+            <div class="prose prose-lg max-w-none mb-8">
+                <div class="text-gray-800 leading-relaxed whitespace-pre-wrap">
+                    {{ article.content }}
+                </div>
+            </div>
+
+            <!-- Article Footer -->
+            <div class="border-t border-gray-200 pt-6 mt-8">
+                <div class="flex flex-col sm:flex-row gap-4">
+                    <a 
+                        href="/articles" 
+                        class="px-6 py-3 bg-gray-100 text-gray-800 rounded-lg font-semibold hover:bg-gray-200 transition duration-200 text-center"
+                    >
+                        ← Back to Articles
+                    </a>
+                    <a 
+                        href="/articles/create" 
+                        class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-center"
+                    >
+                        Create New Article
+                    </a>
+                </div>
+            </div>
+        </div>
+    </article>
+
+    <!-- Related Articles Section -->
+    <section class="mt-16">
+        <h2 class="text-2xl font-bold text-gray-900 mb-6">Related Articles</h2>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+                <h3 class="text-lg font-bold text-gray-900 mb-3">Latest from NewsHub</h3>
+                <p class="text-gray-600 text-sm mb-4">Stay updated with the freshest content from our platform.</p>
+                <a href="/articles" class="text-blue-600 font-semibold hover:text-blue-800">Explore More →</a>
+            </div>
+            {% if article.category %}
+            <div class="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition duration-200">
+                <h3 class="text-lg font-bold text-gray-900 mb-3">More from {{ article.category.name }}</h3>
+                <p class="text-gray-600 text-sm mb-4">Discover more articles in the {{ article.category.name }} category.</p>
+                <a href="/articles?category={{ article.category.id }}" class="text-blue-600 font-semibold hover:text-blue-800">Browse Category →</a>
+            </div>
+            {% endif %}
+        </div>
+    </section>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    // Analytics could be tracked here
+    console.log('Article viewed:', document.querySelector('h1').textContent);
+});
+</script>
 {% endblock %}

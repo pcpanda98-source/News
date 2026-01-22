@@ -20,7 +20,7 @@ pip install -r requirements.txt
 
 ```
 DATABASE_URL=sqlite:///news.db
-NEWS_API_KEY=1e642381fe9d49ae8a5554db83d01aa1
+NEWS_API_KEY=pub_b6ea65c0579b42b5a8f61d11f2eac14f
 SSL_CERT=/path/to/cert.pem
 SSL_KEY=/path/to/key.pem
 ```

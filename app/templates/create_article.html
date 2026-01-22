@@ -1,17 +1,190 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block title %}Create Article - NewsHub{% endblock %}
+
 {% block content %}
-<h2>Create Article</h2>
-<form method="post">
-  <label>Title<br/><input name="title" required></label><br/>
-  <label>Category<br/>
-    <select name="category">
-      <option value="">-- none --</option>
-      {% for c in categories %}
-        <option value="{{c.id}}">{{c.name}}</option>
-      {% endfor %}
-    </select>
-  </label><br/>
-  <label>Content<br/><textarea name="content" rows="8" required></textarea></label><br/>
-  <button type="submit">Create</button>
-</form>
+<div class="max-w-3xl mx-auto">
+    <h1 class="text-4xl font-bold text-gray-900 mb-2">Create New Article</h1>
+    <p class="text-gray-600 text-lg mb-8">Share your thoughts and insights with our readers</p>
+
+    <form method="POST" action="/articles/create" class="bg-white rounded-lg shadow-lg p-8">
+        <!-- Title Field -->
+        <div class="mb-6">
+            <label for="title" class="block text-lg font-semibold text-gray-700 mb-2">Article Title</label>
+            <input 
+                type="text" 
+                id="title" 
+                name="title" 
+                placeholder="Enter an engaging title..." 
+                required
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+            >
+            <p class="text-gray-500 text-sm mt-2">Make your title clear and descriptive</p>
+        </div>
+
+        <!-- Category Field -->
+        <div class="mb-6">
+            <label for="category" class="block text-lg font-semibold text-gray-700 mb-2">Category</label>
+            <select 
+                id="category" 
+                name="category" 
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent bg-white"
+            >
+                <option value="">Select a category (optional)</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <p class="text-gray-500 text-sm mt-2">
+                {% if categories %}
+                Choose from existing categories
+                {% else %}
+                No categories available. <a href="/categories/manage" class="text-blue-600 hover:text-blue-800">Create one</a>
+                {% endif %}
+            </p>
+        </div>
+
+        <!-- Content Field -->
+        <div class="mb-6">
+            <label for="content" class="block text-lg font-semibold text-gray-700 mb-2">Article Content</label>
+            <textarea 
+                id="content" 
+                name="content" 
+                placeholder="Write your article content here... You can use multiple paragraphs." 
+                required
+                rows="12"
+                class="w-full px-4 py-3 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent font-mono"
+            ></textarea>
+            <p class="text-gray-500 text-sm mt-2">
+                <span id="charCount">0</span> characters | 
+                <span id="wordCount">0</span> words
+            </p>
+        </div>
+
+        <!-- Preview Section -->
+        <div class="mb-6">
+            <button 
+                type="button" 
+                onclick="togglePreview()" 
+                class="text-blue-600 font-semibold hover:text-blue-800"
+            >
+                👁️ Show Preview
+            </button>
+            <div id="preview" class="hidden mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                <h3 class="text-2xl font-bold text-gray-900 mb-3">Preview</h3>
+                <p id="previewTitle" class="text-xl font-bold text-gray-900 mb-2"></p>
+                <p id="previewCategory" class="text-sm text-gray-600 mb-3"></p>
+                <div id="previewContent" class="text-gray-700 whitespace-pre-wrap font-mono text-sm"></div>
+            </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="flex flex-col sm:flex-row gap-4 pt-6 border-t border-gray-200">
+            <button 
+                type="submit" 
+                class="flex-1 bg-blue-600 text-white px-8 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+            >
+                ✓ Publish Article
+            </button>
+            <a 
+                href="/articles" 
+                class="flex-1 bg-gray-100 text-gray-800 px-8 py-3 rounded-lg font-semibold hover:bg-gray-200 transition duration-200 text-center"
+            >
+                Cancel
+            </a>
+        </div>
+    </form>
+
+    <!-- Tips Section -->
+    <div class="mt-12 grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-blue-50 rounded-lg p-6 border border-blue-200">
+            <h3 class="text-lg font-bold text-blue-900 mb-3">📝 Writing Tips</h3>
+            <ul class="text-blue-800 text-sm space-y-2">
+                <li>✓ Use a clear, descriptive title</li>
+                <li>✓ Start with a strong introduction</li>
+                <li>✓ Organize content into paragraphs</li>
+                <li>✓ Use simple, engaging language</li>
+                <li>✓ Proofread before publishing</li>
+            </ul>
+        </div>
+        <div class="bg-green-50 rounded-lg p-6 border border-green-200">
+            <h3 class="text-lg font-bold text-green-900 mb-3">✨ Best Practices</h3>
+            <ul class="text-green-800 text-sm space-y-2">
+                <li>✓ Keep paragraphs short and focused</li>
+                <li>✓ Use relevant categories</li>
+                <li>✓ Avoid very long sentences</li>
+                <li>✓ Be factual and accurate</li>
+                <li>✓ Engage with your audience</li>
+            </ul>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const titleInput = document.getElementById('title');
+const contentTextarea = document.getElementById('content');
+const charCount = document.getElementById('charCount');
+const wordCount = document.getElementById('wordCount');
+
+// Update character and word count
+function updateCount() {
+    const content = contentTextarea.value;
+    charCount.textContent = content.length;
+    wordCount.textContent = content.trim().split(/\s+/).filter(w => w.length > 0).length;
+}
+
+// Toggle preview
+function togglePreview() {
+    const preview = document.getElementById('preview');
+    const previewTitle = document.getElementById('previewTitle');
+    const previewCategory = document.getElementById('previewCategory');
+    const previewContent = document.getElementById('previewContent');
+    const btn = event.target;
+
+    if (preview.classList.contains('hidden')) {
+        previewTitle.textContent = titleInput.value || 'Article Title';
+        const categorySelect = document.getElementById('category');
+        const selectedOption = categorySelect.options[categorySelect.selectedIndex];
+        previewCategory.textContent = selectedOption.text !== 'Select a category (optional)' 
+            ? '📁 Category: ' + selectedOption.text 
+            : '';
+        previewContent.textContent = contentTextarea.value || 'Article content will appear here...';
+        preview.classList.remove('hidden');
+        btn.textContent = '👁️ Hide Preview';
+    } else {
+        preview.classList.add('hidden');
+        btn.textContent = '👁️ Show Preview';
+    }
+}
+
+// Update counts on input
+contentTextarea.addEventListener('input', updateCount);
+
+// Initial count
+updateCount();
+
+// Prevent accidental unsaved changes
+let formChanged = false;
+const form = document.querySelector('form');
+const allInputs = form.querySelectorAll('input, textarea, select');
+
+allInputs.forEach(input => {
+    input.addEventListener('change', () => {
+        formChanged = true;
+    });
+});
+
+window.addEventListener('beforeunload', (e) => {
+    if (formChanged) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+});
+
+form.addEventListener('submit', () => {
+    formChanged = false;
+});
+</script>
 {% endblock %}

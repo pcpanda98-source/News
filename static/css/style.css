@@ -1,9 +1,100 @@
-body{ font-family: Arial, sans-serif; margin: 0; padding: 0; }
-header{ background:#222; color:#fff; padding:12px 20px }
-header h1{ margin:0; display:inline-block }
-nav{ display:inline-block; margin-left:20px }
-nav a{ color:#ddd; margin-right:12px; text-decoration:none }
-main{ padding:20px }
-.live-item{ border-bottom:1px solid #eee; padding:8px 0 }
-form input, form textarea, form select{ width:60%; padding:8px; margin:6px 0 }
-button{ padding:8px 12px }
+/* Custom Tailwind CSS Extensions */
+
+/* Smooth transitions */
+* {
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Line clamp utilities */
+.line-clamp-2 {
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+.line-clamp-3 {
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+}
+
+/* Prose styling for article content */
+.prose {
+    font-size: 1.125rem;
+    line-height: 1.75;
+}
+
+/* Animation for notifications */
+@keyframes slideInUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Mobile menu animation */
+#mobileMenu {
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Smooth hover effects */
+.article-card {
+    transition: all 0.3s ease-out;
+}
+
+.article-card:hover {
+    transform: translateY(-4px);
+}
+
+/* Form focus states */
+input:focus,
+textarea:focus,
+select:focus {
+    transition: all 0.2s ease;
+}
+
+/* Button hover effects */
+button {
+    transition: all 0.2s ease;
+}
+
+button:active {
+    transform: scale(0.98);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: #f1f1f1;
+}
+
+::-webkit-scrollbar-thumb {
+    background: #888;
+    border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: #555;
+}

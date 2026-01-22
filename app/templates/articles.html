@@ -1,9 +1,170 @@
-{% extends 'layout.html' %}
+{% extends "layout.html" %}
+
+{% block title %}All Articles - NewsHub{% endblock %}
+
 {% block content %}
-<h2>Articles</h2>
-<ul>
-  {% for a in articles %}
-    <li><a href="/articles/{{ a.id }}">{{ a.title }}</a> — <small>{{ a.created_at.strftime('%Y-%m-%d') }}</small></li>
-  {% endfor %}
-</ul>
+<div class="mb-8 flex items-center justify-between">
+    <div>
+        <h1 class="text-4xl font-bold text-gray-900 mb-4">All Articles</h1>
+        <p class="text-gray-600 text-lg">Browse through our collection of articles</p>
+    </div>
+    <a href="/manage" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 inline-flex items-center space-x-2 h-fit">
+        <span>⚙️</span>
+        <span>Manage News</span>
+    </a>
+</div>
+
+<!-- Search and Filter Section -->
+<div class="bg-white rounded-lg shadow-md p-6 mb-8">
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <input 
+            type="text" 
+            id="searchInput" 
+            placeholder="Search articles..." 
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+        <select 
+            id="categoryFilter" 
+            class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+        >
+            <option value="">All Categories</option>
+            <option value="">Featured</option>
+            <option value="">Latest</option>
+        </select>
+        <button 
+            onclick="resetFilters()" 
+            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+        >
+            Reset Filters
+        </button>
+    </div>
+</div>
+
+<!-- Articles Grid -->
+{% if articles %}
+<div id="articlesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+    {% for article in articles %}
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden article-card" data-title="{{ article.title|lower }}" data-category="{{ article.category.name if article.category else ''|lower }}">
+        <div class="relative">
+            <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-40 flex items-center justify-center">
+                <span class="text-5xl">📰</span>
+            </div>
+            {% if article.category %}
+            <div class="absolute top-3 right-3 bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold">
+                {{ article.category.name }}
+            </div>
+            {% endif %}
+        </div>
+        
+        <div class="p-6">
+            <h3 class="text-xl font-bold text-gray-900 mb-3 line-clamp-2">{{ article.title }}</h3>
+            
+            <p class="text-gray-600 text-sm mb-4 line-clamp-3">{{ article.content[:150] }}...</p>
+            
+            <div class="flex items-center justify-between text-sm text-gray-500 mb-4">
+                <span>📅 {{ article.created_at.strftime('%b %d, %Y') if article.created_at else 'Recently' }}</span>
+                <span class="flex items-center space-x-1">
+                    <span>📄</span>
+                    <span>Article</span>
+                </span>
+            </div>
+            
+            <a 
+                href="/articles/{{ article.id }}" 
+                class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+            >
+                Read Full Article
+            </a>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Empty State Message (Hidden by default) -->
+<div id="emptyState" class="hidden bg-gray-100 rounded-lg p-12 text-center">
+    <p class="text-gray-600 text-lg mb-4">No articles found matching your search.</p>
+    <button 
+        onclick="resetFilters()" 
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+    >
+        Clear Filters
+    </button>
+</div>
+
+{% else %}
+<div class="bg-gray-100 rounded-lg p-12 text-center">
+    <p class="text-gray-600 text-lg mb-4">No articles available yet.</p>
+    <a 
+        href="/articles/create" 
+        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block"
+    >
+        Create First Article
+    </a>
+</div>
+{% endif %}
+
+<!-- Pagination Info -->
+{% if articles %}
+<div class="bg-white rounded-lg shadow-md p-4 text-center">
+    <p class="text-gray-600">Showing <span id="articleCount">{{ articles|length }}</span> articles</p>
+</div>
+{% endif %}
+
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
+<script>
+// Search and Filter Functionality
+const searchInput = document.getElementById('searchInput');
+const categoryFilter = document.getElementById('categoryFilter');
+const articlesContainer = document.getElementById('articlesContainer');
+const emptyState = document.getElementById('emptyState');
+const articleCards = document.querySelectorAll('.article-card');
+
+function filterArticles() {
+    const searchTerm = searchInput.value.toLowerCase();
+    const selectedCategory = categoryFilter.value.toLowerCase();
+    let visibleCount = 0;
+
+    articleCards.forEach(card => {
+        const title = card.dataset.title;
+        const category = card.dataset.category;
+        
+        const matchesSearch = title.includes(searchTerm);
+        const matchesCategory = !selectedCategory || category.includes(selectedCategory);
+        
+        if (matchesSearch && matchesCategory) {
+            card.style.display = '';
+            visibleCount++;
+        } else {
+            card.style.display = 'none';
+        }
+    });
+
+    if (visibleCount === 0) {
+        articlesContainer.style.display = 'none';
+        emptyState.classList.remove('hidden');
+    } else {
+        articlesContainer.style.display = 'grid';
+        emptyState.classList.add('hidden');
+    }
+
+    document.getElementById('articleCount').textContent = visibleCount;
+}
+
+function resetFilters() {
+    searchInput.value = '';
+    categoryFilter.value = '';
+    filterArticles();
+}
+
+searchInput.addEventListener('input', filterArticles);
+categoryFilter.addEventListener('change', filterArticles);
+
+// Load initial state
+document.addEventListener('DOMContentLoaded', () => {
+    filterArticles();
+});
+</script>
 {% endblock %}

@@ -1,0 +1,451 @@
+{% extends "layout.html" %}
+
+{% block title %}Manage Articles - NewsHub{% endblock %}
+
+{% block content %}
+<div class="max-w-7xl mx-auto">
+    <div class="mb-8 flex items-center justify-between">
+        <div>
+            <h1 class="text-4xl font-bold text-gray-900 mb-2">Manage Articles</h1>
+            <p class="text-gray-600 text-lg">View, edit, and manage all articles</p>
+        </div>
+        <a href="/articles/create" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-flex items-center space-x-2">
+            <span>➕</span>
+            <span>Create New Article</span>
+        </a>
+    </div>
+
+    <!-- Filter and Search Section -->
+    <div class="bg-white rounded-lg shadow-md p-6 mb-8">
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
+            <input 
+                type="text" 
+                id="searchInput" 
+                placeholder="Search articles by title..." 
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            >
+            <select 
+                id="categoryFilter" 
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+                <option value="">All Categories</option>
+                {% for cat in categories %}
+                <option value="{{ cat.id }}">{{ cat.name }}</option>
+                {% endfor %}
+            </select>
+            <select 
+                id="sortFilter" 
+                class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+            >
+                <option value="recent">Newest First</option>
+                <option value="oldest">Oldest First</option>
+                <option value="title">Alphabetical</option>
+            </select>
+            <button 
+                onclick="resetFilters()" 
+                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200"
+            >
+                Reset Filters
+            </button>
+        </div>
+    </div>
+
+    <!-- Articles Management Table -->
+    <div class="bg-white rounded-lg shadow-lg overflow-hidden">
+        <div class="bg-gray-50 px-8 py-4 border-b border-gray-200 flex items-center justify-between">
+            <h2 class="text-2xl font-bold text-gray-900">All Articles</h2>
+            <span class="text-sm text-gray-600">Total: <span id="totalCount">{{ articles|length }}</span></span>
+        </div>
+
+        {% if articles %}
+        <div class="overflow-x-auto">
+            <table class="w-full">
+                <thead class="bg-gray-50 border-b border-gray-200">
+                    <tr>
+                        <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">ID</th>
+                        <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Title</th>
+                        <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Category</th>
+                        <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Created</th>
+                        <th class="px-6 py-4 text-left text-sm font-bold text-gray-700">Preview</th>
+                        <th class="px-6 py-4 text-center text-sm font-bold text-gray-700">Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="articlesTable">
+                    {% for article in articles %}
+                    <tr class="border-b border-gray-200 hover:bg-gray-50 transition duration-200 article-row" data-id="{{ article.id }}" data-title="{{ article.title|lower }}" data-category="{{ article.category.id if article.category else '' }}" data-date="{{ article.created_at.strftime('%s') if article.created_at else '0' }}">
+                        <td class="px-6 py-4 text-sm text-gray-700">
+                            <span class="font-mono font-bold text-blue-600">#{{ article.id }}</span>
+                        </td>
+                        <td class="px-6 py-4">
+                            <div class="max-w-xs">
+                                <p class="text-sm font-semibold text-gray-900 truncate">{{ article.title }}</p>
+                                <p class="text-xs text-gray-500 truncate">{{ article.content[:50] }}...</p>
+                            </div>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            {% if article.category %}
+                            <span class="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-xs font-semibold">
+                                {{ article.category.name }}
+                            </span>
+                            {% else %}
+                            <span class="text-gray-500 text-xs">—</span>
+                            {% endif %}
+                        </td>
+                        <td class="px-6 py-4 text-sm text-gray-600">
+                            <span class="text-xs">{{ article.created_at.strftime('%b %d, %Y') if article.created_at else 'Recently' }}</span>
+                        </td>
+                        <td class="px-6 py-4 text-sm">
+                            <span class="text-xs text-gray-500">{{ article.content|length }} chars</span>
+                        </td>
+                        <td class="px-6 py-4 text-center">
+                            <div class="flex items-center justify-center gap-3">
+                                <a 
+                                    href="/articles/{{ article.id }}" 
+                                    class="text-green-600 hover:text-green-800 font-semibold transition duration-200 text-sm"
+                                    title="View Article"
+                                >
+                                    👁️ View
+                                </a>
+                                <button 
+                                    type="button"
+                                    class="text-blue-600 hover:text-blue-800 font-semibold transition duration-200 text-sm edit-btn"
+                                    data-id="{{ article.id }}"
+                                    data-title="{{ article.title }}"
+                                    data-category="{{ article.category.id if article.category else '' }}"
+                                    data-content="{{ article.content }}"
+                                    title="Edit Article"
+                                >
+                                    ✏️ Edit
+                                </button>
+                                <button 
+                                    type="button"
+                                    class="text-red-600 hover:text-red-800 font-semibold transition duration-200 text-sm delete-btn"
+                                    data-id="{{ article.id }}"
+                                    title="Delete Article"
+                                >
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
+        <div class="bg-gray-50 px-8 py-4 border-t border-gray-200">
+            <div class="flex items-center justify-between">
+                <p class="text-sm text-gray-600">
+                    Showing <span id="visibleCount">{{ articles|length }}</span> of <span id="totalCountFooter">{{ articles|length }}</span> articles
+                </p>
+                <div class="text-sm text-gray-500">
+                    <span id="selectedCount">0</span> selected
+                </div>
+            </div>
+        </div>
+
+        {% else %}
+        <div class="px-8 py-12 text-center">
+            <svg class="w-16 h-16 text-gray-300 mx-auto mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+            </svg>
+            <p class="text-gray-600 text-lg mb-4">No articles available yet.</p>
+            <a 
+                href="/articles/create" 
+                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block"
+            >
+                Create First Article
+            </a>
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Back Link -->
+    <div class="mt-8">
+        <a href="/articles" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-2">
+            <span>←</span>
+            <span>Back to Articles</span>
+        </a>
+    </div>
+</div>
+
+<!-- Edit Article Modal -->
+<div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto">
+    <div class="bg-white rounded-lg shadow-2xl p-8 max-w-2xl w-full mx-4 my-8">
+        <h3 class="text-2xl font-bold text-gray-900 mb-6">Edit Article</h3>
+        <form id="editForm" onsubmit="submitEdit(event)">
+            <div class="mb-6">
+                <label for="editTitle" class="block text-sm font-semibold text-gray-700 mb-2">Title</label>
+                <input 
+                    type="text" 
+                    id="editTitle" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+                    required
+                >
+            </div>
+
+            <div class="mb-6">
+                <label for="editCategory" class="block text-sm font-semibold text-gray-700 mb-2">Category</label>
+                <select 
+                    id="editCategory" 
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-white"
+                >
+                    <option value="">No Category</option>
+                    {% for cat in categories %}
+                    <option value="{{ cat.id }}">{{ cat.name }}</option>
+                    {% endfor %}
+                </select>
+            </div>
+
+            <div class="mb-6">
+                <label for="editContent" class="block text-sm font-semibold text-gray-700 mb-2">Content</label>
+                <textarea 
+                    id="editContent" 
+                    rows="8"
+                    class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 font-mono"
+                    required
+                ></textarea>
+                <p class="text-xs text-gray-500 mt-2">
+                    <span id="editCharCount">0</span> characters
+                </p>
+            </div>
+
+            <input type="hidden" id="editArticleId">
+
+            <div class="flex gap-4">
+                <button 
+                    type="submit" 
+                    class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+                >
+                    Save Changes
+                </button>
+                <button 
+                    type="button" 
+                    onclick="closeEditModal()" 
+                    class="flex-1 bg-gray-200 text-gray-800 px-4 py-2 rounded-lg font-semibold hover:bg-gray-300 transition duration-200"
+                >
+                    Cancel
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- Stats Section -->
+<div class="mt-12 grid grid-cols-1 md:grid-cols-3 gap-6">
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-blue-600 mb-2">{{ articles|length }}</div>
+        <p class="text-gray-600">Total Articles</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-green-600 mb-2">{{ categories|length }}</div>
+        <p class="text-gray-600">Categories</p>
+    </div>
+    <div class="bg-white rounded-lg shadow-md p-6 text-center">
+        <div class="text-4xl font-bold text-purple-600 mb-2">{{ (articles|length * 100 / 1000)|int }}%</div>
+        <p class="text-gray-600">Database Usage</p>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+// Article Management Functions
+function editArticle(id, title, categoryId, content) {
+    document.getElementById('editArticleId').value = id;
+    document.getElementById('editTitle').value = title;
+    document.getElementById('editCategory').value = categoryId;
+    document.getElementById('editContent').value = content;
+    updateCharCount();
+    document.getElementById('editModal').classList.remove('hidden');
+    document.getElementById('editTitle').focus();
+}
+
+function closeEditModal() {
+    document.getElementById('editModal').classList.add('hidden');
+}
+
+function updateCharCount() {
+    const content = document.getElementById('editContent').value;
+    document.getElementById('editCharCount').textContent = content.length;
+}
+
+function submitEdit(event) {
+    event.preventDefault();
+    const id = document.getElementById('editArticleId').value;
+    const title = document.getElementById('editTitle').value;
+    const categoryId = document.getElementById('editCategory').value || null;
+    const content = document.getElementById('editContent').value;
+
+    fetch(`/api/articles/${id}`, {
+        method: 'PUT',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ 
+            title: title, 
+            content: content, 
+            category_id: categoryId 
+        })
+    })
+    .then(response => {
+        if (response.ok) {
+            closeEditModal();
+            showNotification('Article updated successfully!', 'success');
+            setTimeout(() => location.reload(), 500);
+        } else {
+            showNotification('Error updating article', 'error');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        showNotification('Error updating article', 'error');
+    });
+}
+
+function deleteArticle(id) {
+    if (confirm('Are you sure you want to delete this article? This action cannot be undone.')) {
+        fetch(`/api/articles/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => {
+            if (response.ok) {
+                const row = document.querySelector(`[data-id="${id}"]`);
+                row.style.opacity = '0';
+                row.style.transform = 'translateX(-20px)';
+                setTimeout(() => {
+                    row.remove();
+                    updateStats();
+                    showNotification('Article deleted successfully!', 'success');
+                }, 300);
+            } else {
+                showNotification('Error deleting article', 'error');
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showNotification('Error deleting article', 'error');
+        });
+    }
+}
+
+function showNotification(message, type = 'info') {
+    const notification = document.createElement('div');
+    notification.className = `fixed bottom-4 right-4 px-6 py-3 rounded-lg font-semibold text-white z-50 ${
+        type === 'success' ? 'bg-green-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600'
+    }`;
+    notification.textContent = message;
+    notification.style.animation = 'slideInUp 0.3s ease-out';
+    document.body.appendChild(notification);
+    
+    setTimeout(() => {
+        notification.style.opacity = '0';
+        notification.style.transform = 'translateY(20px)';
+        setTimeout(() => notification.remove(), 300);
+    }, 3000);
+}
+
+// Event Delegation for Edit and Delete Buttons
+document.addEventListener('DOMContentLoaded', function() {
+    // Edit button click handler
+    document.querySelectorAll('.edit-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            const title = this.dataset.title;
+            const categoryId = this.dataset.category;
+            const content = this.dataset.content;
+            editArticle(id, title, categoryId, content);
+        });
+    });
+
+    // Delete button click handler
+    document.querySelectorAll('.delete-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.dataset.id;
+            deleteArticle(id);
+        });
+    });
+
+    // Filter and Search Functions
+    const searchInput = document.getElementById('searchInput');
+    const categoryFilter = document.getElementById('categoryFilter');
+    const sortFilter = document.getElementById('sortFilter');
+    const articlesTable = document.getElementById('articlesTable');
+    const articleRows = document.querySelectorAll('.article-row');
+
+    function filterAndSort() {
+        const searchTerm = searchInput.value.toLowerCase();
+        const selectedCategory = categoryFilter.value;
+        const sortBy = sortFilter.value;
+        
+        let visibleRows = [];
+        
+        articleRows.forEach(row => {
+            const title = row.dataset.title;
+            const category = row.dataset.category;
+            
+            const matchesSearch = title.includes(searchTerm);
+            const matchesCategory = !selectedCategory || category === selectedCategory;
+            
+            if (matchesSearch && matchesCategory) {
+                row.style.display = '';
+                visibleRows.push(row);
+            } else {
+                row.style.display = 'none';
+            }
+        });
+        
+        // Sort visible rows
+        visibleRows.sort((a, b) => {
+            if (sortBy === 'recent') {
+                return parseInt(b.dataset.date) - parseInt(a.dataset.date);
+            } else if (sortBy === 'oldest') {
+                return parseInt(a.dataset.date) - parseInt(b.dataset.date);
+            } else if (sortBy === 'title') {
+                return a.dataset.title.localeCompare(b.dataset.title);
+            }
+        });
+        
+        // Reorder rows in table
+        visibleRows.forEach(row => {
+            articlesTable.appendChild(row);
+        });
+        
+        updateStats();
+    }
+
+    function resetFilters() {
+        searchInput.value = '';
+        categoryFilter.value = '';
+        sortFilter.value = 'recent';
+        filterAndSort();
+    }
+
+    function updateStats() {
+        const visibleRows = Array.from(articleRows).filter(row => row.style.display !== 'none');
+        document.getElementById('visibleCount').textContent = visibleRows.length;
+        document.getElementById('selectedCount').textContent = '0';
+    }
+
+    // Event Listeners
+    searchInput.addEventListener('input', filterAndSort);
+    categoryFilter.addEventListener('change', filterAndSort);
+    sortFilter.addEventListener('change', filterAndSort);
+    document.getElementById('editContent').addEventListener('input', updateCharCount);
+
+    // Close modal when clicking outside
+    document.getElementById('editModal').addEventListener('click', function(e) {
+        if (e.target === this) {
+            closeEditModal();
+        }
+    });
+
+    // Expose resetFilters to window for button
+    window.resetFilters = resetFilters;
+
+    // Initial stats
+    updateStats();
+});
+</script>
+{% endblock %}
