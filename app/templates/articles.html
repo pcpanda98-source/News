@@ -8,7 +8,7 @@
         <h1 class="text-4xl font-bold text-gray-900 mb-4">All Articles</h1>
         <p class="text-gray-600 text-lg">Browse through our collection of articles</p>
     </div>
-    <a href="/manage" class="bg-purple-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-purple-700 transition duration-200 inline-flex items-center space-x-2 h-fit">
+    <a href="/manage" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-flex items-center space-x-2 h-fit">
         <span>⚙️</span>
         <span>Manage News</span>
     </a>
@@ -33,7 +33,7 @@
         </select>
         <button 
             onclick="resetFilters()" 
-            class="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+            class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200"
         >
             Reset Filters
         </button>
@@ -43,12 +43,23 @@
 <!-- Articles Grid -->
 {% if articles %}
 <div id="articlesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
-    {% for article in articles %}
+{% for article in articles %}
     <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden article-card" data-title="{{ article.title|lower }}" data-category="{{ article.category.name if article.category else ''|lower }}">
         <div class="relative">
+            {% if article.image_url %}
+            <div class="h-40 overflow-hidden">
+                <img 
+                    src="{{ article.image_url }}" 
+                    alt="{{ article.title }}"
+                    class="w-full h-full object-cover"
+                    onerror="this.parentElement.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-blue-400 to-blue-600 h-40 flex items-center justify-center\'><span class=\'text-5xl\'>📰</span></div>'"
+                >
+            </div>
+            {% else %}
             <div class="bg-gradient-to-r from-blue-400 to-blue-600 h-40 flex items-center justify-center">
                 <span class="text-5xl">📰</span>
             </div>
+            {% endif %}
             {% if article.category %}
             <div class="absolute top-3 right-3 bg-blue-100 text-blue-800 text-xs px-3 py-1 rounded-full font-semibold">
                 {{ article.category.name }}
@@ -71,7 +82,7 @@
             
             <a 
                 href="/articles/{{ article.id }}" 
-                class="inline-block bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+                class="inline-block bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition duration-200"
             >
                 Read Full Article
             </a>
@@ -85,7 +96,7 @@
     <p class="text-gray-600 text-lg mb-4">No articles found matching your search.</p>
     <button 
         onclick="resetFilters()" 
-        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+        class="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition duration-200"
     >
         Clear Filters
     </button>
@@ -96,7 +107,7 @@
     <p class="text-gray-600 text-lg mb-4">No articles available yet.</p>
     <a 
         href="/articles/create" 
-        class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block"
+        class="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-block"
     >
         Create First Article
     </a>

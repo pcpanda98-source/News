@@ -12,9 +12,20 @@
     <!-- Article Header -->
     <article class="bg-white rounded-lg shadow-lg overflow-hidden">
         <!-- Hero Image -->
+        {% if article.image_url %}
+        <div class="h-64 overflow-hidden">
+            <img 
+                src="{{ article.image_url }}" 
+                alt="{{ article.title }}"
+                class="w-full h-full object-cover"
+                onerror="this.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-blue-500 to-blue-700 h-64 flex items-center justify-center\'><span class=\'text-8xl\'>📰</span></div>'"
+            >
+        </div>
+        {% else %}
         <div class="bg-gradient-to-r from-blue-500 to-blue-700 h-64 flex items-center justify-center">
             <span class="text-8xl">📰</span>
         </div>
+        {% endif %}
 
         <!-- Article Content -->
         <div class="p-8">
@@ -60,7 +71,7 @@
                     </a>
                     <a 
                         href="/articles/create" 
-                        class="px-6 py-3 bg-blue-600 text-white rounded-lg font-semibold hover:bg-blue-700 transition duration-200 text-center"
+                        class="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition duration-200 text-center"
                     >
                         Create New Article
                     </a>

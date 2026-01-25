@@ -262,6 +262,225 @@ body {
     box-shadow: 0 4px 12px var(--shadow-color);
 }
 
+/* ==================== Sidebar Styles ==================== */
+
+/* Mobile header */
+.sidebar-mobile-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 50;
+    background-color: #111827;
+    color: white;
+    height: 64px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 1rem;
+}
+
+.dark .sidebar-mobile-header {
+    background-color: #030712;
+}
+
+/* Sidebar overlay */
+.sidebar-overlay {
+    position: fixed;
+    inset: 0;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 40;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out;
+}
+
+.overlay-visible {
+    opacity: 1 !important;
+    visibility: visible !important;
+}
+
+/* Main sidebar */
+.sidebar {
+    position: fixed;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 16rem;
+    background-color: var(--bg-primary);
+    color: var(--text-primary);
+    border-right: 1px solid var(--border-color);
+    z-index: 50;
+    display: flex;
+    flex-direction: column;
+    transform: translateX(-100%);
+    transition: transform 0.3s ease-in-out;
+    box-shadow: 4px 0 15px var(--shadow-color);
+}
+
+.sidebar-open {
+    transform: translateX(0) !important;
+}
+
+/* Sidebar logo */
+.sidebar-logo {
+    padding: 1.5rem;
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Sidebar navigation */
+.sidebar-nav {
+    flex: 1;
+    padding-top: 1.5rem;
+    padding-bottom: 1.5rem;
+    overflow-y: auto;
+}
+
+/* Sidebar section header */
+.sidebar-section-header {
+    margin-top: 1.5rem;
+    margin-bottom: 0.5rem;
+    padding-left: 1rem;
+    padding-right: 1rem;
+}
+
+.sidebar-section-header span {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: var(--text-muted);
+}
+
+/* Sidebar links */
+.sidebar-link {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    transition: all 0.2s ease;
+    color: var(--text-secondary);
+}
+
+.sidebar-link:hover {
+    background-color: var(--bg-tertiary);
+    color: var(--text-primary);
+}
+
+.sidebar-link svg {
+    flex-shrink: 0;
+    color: var(--text-muted);
+}
+
+.sidebar-link:hover svg {
+    color: var(--text-primary);
+}
+
+/* Live news link */
+.sidebar-link.live-link:hover {
+    background-color: rgba(220, 38, 38, 0.1);
+}
+
+.sidebar-link.live-link:hover span {
+    color: #ef4444 !important;
+}
+
+/* Sidebar footer */
+.sidebar-footer {
+    padding: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+.sidebar-theme-toggle {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    padding: 0.75rem 1rem;
+    border-radius: 0.5rem;
+    background-color: var(--bg-tertiary);
+    color: #fbbf24;
+    transition: all 0.2s ease;
+}
+
+.sidebar-theme-toggle:hover {
+    background-color: var(--border-color);
+}
+
+/* Sidebar link accent bar */
+.sidebar-link {
+    position: relative;
+    overflow: hidden;
+}
+
+.sidebar-link::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    height: 100%;
+    width: 3px;
+    background-color: transparent;
+    transition: background-color 0.3s ease;
+}
+
+.sidebar-link:hover::before {
+    background-color: #3b82f6;
+}
+
+/* Main content */
+.main-content {
+    min-height: 100vh;
+}
+
+/* Mobile header spacer */
+.mobile-header-spacer {
+    height: 64px;
+}
+
+/* Main container */
+.main-container {
+    max-width: 80rem;
+    margin-left: auto;
+    margin-right: auto;
+    padding-left: 1rem;
+    padding-right: 1rem;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+}
+
+/* Responsive: Desktop shows sidebar, hides mobile header */
+@media (min-width: 1024px) {
+    .sidebar-mobile-header {
+        display: none !important;
+    }
+    
+    .mobile-header-spacer {
+        display: none !important;
+    }
+    
+    .sidebar {
+        transform: translateX(0) !important;
+    }
+    
+    .main-content {
+        margin-left: 16rem;
+    }
+}
+
+/* Mobile responsive sidebar */
+@media (max-width: 1023px) {
+    .sidebar {
+        width: 280px;
+    }
+    
+    .main-content {
+        margin-left: 0;
+    }
+}
+
 /* ==================== Page-Specific Dark Mode Styles ==================== */
 
 /* Hero section gradients */
@@ -546,3 +765,216 @@ body {
 .dark ::-webkit-scrollbar-thumb:hover {
     background: #9ca3af;
 }
+
+/* ==================== Admin Panel Dark Mode Styles ==================== */
+
+/* Admin dashboard cards */
+.dark .bg-white.rounded-lg.shadow-md {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color);
+}
+
+/* Admin dashboard headings */
+.dark .text-gray-900 {
+    color: var(--text-primary) !important;
+}
+
+/* Admin section backgrounds */
+.dark section.bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+/* Admin list items */
+.dark ul li.p-4 {
+    background-color: var(--bg-secondary) !important;
+    border: 1px solid var(--border-color);
+}
+
+.dark ul li.p-4:hover {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Admin links */
+.dark a.text-blue-400 {
+    color: #60a5fa !important;
+}
+
+.dark a.text-blue-400:hover {
+    color: #93c5fd !important;
+}
+
+/* Admin table headers */
+.dark thead.bg-gray-50 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+.dark th {
+    color: var(--text-primary) !important;
+}
+
+/* Admin table cells */
+.dark td.text-gray-700 {
+    color: var(--text-secondary) !important;
+}
+
+.dark td.text-gray-900 {
+    color: var(--text-primary) !important;
+}
+
+/* Admin action buttons - light colors with good contrast */
+.dark a.text-blue-400,
+.dark button.text-blue-400 {
+    color: #60a5fa !important;
+}
+
+.dark a.text-blue-400:hover,
+.dark button.text-blue-400:hover {
+    color: #93c5fd !important;
+}
+
+.dark a.text-red-400,
+.dark button.text-red-400 {
+    color: #f87171 !important;
+}
+
+.dark a.text-red-400:hover,
+.dark button.text-red-400:hover {
+    color: #fca5a5 !important;
+}
+
+/* Admin category pills */
+.dark .bg-blue-100 {
+    background-color: rgba(59, 130, 246, 0.2) !important;
+}
+
+.dark .text-blue-800 {
+    color: #93c5fd !important;
+}
+
+/* Admin table rows */
+.dark tbody tr.border-b {
+    border-color: var(--border-color) !important;
+}
+
+.dark tbody tr:hover {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Admin filter section */
+.dark .bg-white.rounded-lg.shadow-md.p-6 {
+    background-color: var(--card-bg) !important;
+    border: 1px solid var(--border-color);
+}
+
+/* Admin input fields */
+.dark input[type="text"],
+.dark select {
+    background-color: var(--input-bg) !important;
+    border-color: var(--border-color) !important;
+    color: var(--text-primary) !important;
+}
+
+.dark input[type="text"]::placeholder {
+    color: var(--text-muted) !important;
+}
+
+/* Admin section headers */
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Admin modal */
+.dark #editModal .bg-white {
+    background-color: var(--card-bg) !important;
+}
+
+/* Admin toast notification */
+.dark .fixed.bottom-4.right-4 {
+    box-shadow: 0 4px 12px var(--shadow-color);
+}
+
+/* Media library overlay */
+.dark .bg-black.bg-opacity-50 {
+    background-color: rgba(0, 0, 0, 0.7) !important;
+}
+
+/* Media item overlay */
+.dark .group-hover\:bg-opacity-40 {
+    background-color: rgba(0, 0, 0, 0.4) !important;
+}
+
+/* Media item gradient text */
+.dark .bg-gradient-to-t {
+    background: linear-gradient(to top, rgba(0, 0, 0, 0.8), transparent) !important;
+}
+
+.dark .text-white {
+    color: var(--text-primary) !important;
+}
+
+.dark .text-gray-300 {
+    color: var(--text-muted) !important;
+}
+
+/* Upload section */
+.dark .border-dashed {
+    border-color: var(--border-color) !important;
+}
+
+.dark .bg-gray-50.rounded-lg.p-6 {
+    background-color: var(--bg-secondary) !important;
+}
+
+/* Upload tips section */
+.dark .bg-gray-50.rounded-lg.p-6 {
+    background-color: var(--bg-tertiary) !important;
+}
+
+/* Drop zone hover */
+.dark .hover\:border-blue-500:hover {
+    border-color: #3b82f6 !important;
+}
+
+/* ==================== Button Text Color Styles ==================== */
+
+/* Ensure all gray-600 buttons have white text */
+.bg-gray-600 {
+    color: #ffffff !important;
+}
+
+/* Ensure all gray-500 buttons have white text */
+.bg-gray-500 {
+    color: #ffffff !important;
+}
+
+/* Ensure all gray-700 buttons have white text */
+.bg-gray-700 {
+    color: #ffffff !important;
+}
+
+/* Ensure all gray-800 buttons have white text */
+.bg-gray-800 {
+    color: #ffffff !important;
+}
+
+/* Dark mode button text enforcement */
+.dark .bg-gray-600,
+.dark .bg-gray-500,
+.dark .bg-gray-700,
+.dark .bg-gray-800 {
+    color: #ffffff !important;
+}
+
+/* Sidebar admin buttons text color */
+.sidebar-link.bg-gray-600,
+.sidebar-link.bg-gray-700 {
+    color: #ffffff !important;
+}
+
+.sidebar-link.bg-gray-600:hover,
+.sidebar-link.bg-gray-700:hover {
+    color: #ffffff !important;
+}
+
+

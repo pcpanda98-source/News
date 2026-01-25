@@ -77,19 +77,37 @@ document.addEventListener('DOMContentLoaded', function() {
     // Initialize theme
     ThemeManager.init();
 
-    const menuBtn = document.getElementById('menuBtn');
-    const mobileMenu = document.getElementById('mobileMenu');
+    const mobileMenuBtn = document.getElementById('mobileMenuBtn');
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
 
-    if (menuBtn) {
-        menuBtn.addEventListener('click', function() {
-            mobileMenu.classList.toggle('hidden');
-        });
+    // Sidebar toggle function
+    function toggleSidebar() {
+        if (sidebar && sidebarOverlay) {
+            sidebar.classList.toggle('sidebar-open');
+            sidebarOverlay.classList.toggle('overlay-visible');
+        }
+    }
 
-        // Close menu when a link is clicked
-        const menuLinks = mobileMenu.querySelectorAll('a');
-        menuLinks.forEach(link => {
+    // Mobile menu button click handler
+    if (mobileMenuBtn) {
+        mobileMenuBtn.addEventListener('click', toggleSidebar);
+    }
+
+    // Close sidebar when overlay is clicked
+    if (sidebarOverlay) {
+        sidebarOverlay.addEventListener('click', toggleSidebar);
+    }
+
+    // Close sidebar when a link is clicked (mobile)
+    if (sidebar) {
+        const sidebarLinks = sidebar.querySelectorAll('a');
+        sidebarLinks.forEach(link => {
             link.addEventListener('click', function() {
-                mobileMenu.classList.add('hidden');
+                if (window.innerWidth < 1024) {
+                    sidebar.classList.remove('sidebar-open');
+                    sidebarOverlay?.classList.remove('overlay-visible');
+                }
             });
         });
     }
@@ -105,6 +123,17 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
 });
+
+// Global sidebar toggle function
+window.toggleSidebar = function() {
+    const sidebar = document.getElementById('sidebar');
+    const sidebarOverlay = document.getElementById('sidebarOverlay');
+    
+    if (sidebar && sidebarOverlay) {
+        sidebar.classList.toggle('sidebar-open');
+        sidebarOverlay.classList.toggle('overlay-visible');
+    }
+};
 
 // Global theme toggle function
 window.toggleTheme = function() {

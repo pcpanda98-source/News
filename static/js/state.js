@@ -81,6 +81,20 @@ const Store = (function(){
     async loadCategories() {
       try {
         const response = await fetch('/api/categories');
+        
+        // Check if response is OK
+        if (!response.ok) {
+          console.error('Error loading categories: HTTP', response.status);
+          return [];
+        }
+        
+        // Check content type to ensure it's JSON
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          console.error('Error loading categories: Expected JSON but got', contentType);
+          return [];
+        }
+        
         const categories = await response.json();
         this.set('categories', categories);
         return categories;

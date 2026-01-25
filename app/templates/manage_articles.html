@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+ {% extends "layout.html" %}
 
 {% block title %}Manage Articles - NewsHub{% endblock %}
 
@@ -9,7 +9,7 @@
             <h1 class="text-4xl font-bold text-gray-900 mb-2">Manage Articles</h1>
             <p class="text-gray-600 text-lg">View, edit, and manage all articles</p>
         </div>
-        <a href="/articles/create" class="bg-blue-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-flex items-center space-x-2">
+        <a href="/articles/create" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-flex items-center space-x-2">
             <span>➕</span>
             <span>Create New Article</span>
         </a>
@@ -95,20 +95,31 @@
                             <span class="text-xs">{{ article.created_at.strftime('%b %d, %Y') if article.created_at else 'Recently' }}</span>
                         </td>
                         <td class="px-6 py-4 text-sm">
+                            {% if article.image_url %}
+                            <div class="w-12 h-12 rounded-lg overflow-hidden">
+                                <img 
+                                    src="{{ article.image_url }}" 
+                                    alt="Preview"
+                                    class="w-full h-full object-cover"
+                                    onerror="this.parentElement.innerHTML='<div class=\'w-12 h-12 rounded-lg bg-gradient-to-r from-blue-400 to-blue-600 flex items-center justify-center\'><span class=\'text-xl\'>📰</span></div>'"
+                                >
+                            </div>
+                            {% else %}
                             <span class="text-xs text-gray-500">{{ article.content|length }} chars</span>
+                            {% endif %}
                         </td>
                         <td class="px-6 py-4 text-center">
                             <div class="flex items-center justify-center gap-3">
                                 <a 
                                     href="/articles/{{ article.id }}" 
-                                    class="text-green-600 hover:text-green-800 font-semibold transition duration-200 text-sm"
+                                    class="text-blue-400 hover:text-blue-300 font-semibold transition duration-200 text-sm"
                                     title="View Article"
                                 >
                                     👁️ View
                                 </a>
                                 <button 
                                     type="button"
-                                    class="text-blue-600 hover:text-blue-800 font-semibold transition duration-200 text-sm edit-btn"
+                                    class="text-blue-400 hover:text-blue-300 font-semibold transition duration-200 text-sm edit-btn"
                                     data-id="{{ article.id }}"
                                     data-title="{{ article.title }}"
                                     data-category="{{ article.category.id if article.category else '' }}"
@@ -119,7 +130,7 @@
                                 </button>
                                 <button 
                                     type="button"
-                                    class="text-red-600 hover:text-red-800 font-semibold transition duration-200 text-sm delete-btn"
+                                    class="text-red-400 hover:text-red-300 font-semibold transition duration-200 text-sm delete-btn"
                                     data-id="{{ article.id }}"
                                     title="Delete Article"
                                 >
@@ -152,7 +163,7 @@
             <p class="text-gray-600 text-lg mb-4">No articles available yet.</p>
             <a 
                 href="/articles/create" 
-                class="bg-blue-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200 inline-block"
+                class="bg-gray-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-block"
             >
                 Create First Article
             </a>
@@ -215,7 +226,7 @@
             <div class="flex gap-4">
                 <button 
                     type="submit" 
-                    class="flex-1 bg-blue-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-blue-700 transition duration-200"
+                    class="flex-1 bg-gray-600 text-white px-4 py-2 rounded-lg font-semibold hover:bg-gray-700 transition duration-200"
                 >
                     Save Changes
                 </button>

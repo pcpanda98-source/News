@@ -20,6 +20,13 @@ def manage_categories():
     return render_template('manage_categories.html', categories=cats)
 
 
+@category_bp.route('/api/categories', methods=['GET'])
+def api_list_categories():
+    """API endpoint to get all categories"""
+    cats = list_categories()
+    return jsonify([c.to_dict() for c in cats])
+
+
 @category_bp.route('/api/categories/<int:cid>', methods=['PUT', 'DELETE'])
 def api_modify_category(cid):
     if request.method == 'DELETE':
