@@ -38,10 +38,11 @@ def create_article_page():
     categories = list_categories()
     if request.method == 'POST':
         title = request.form['title']
+        author = request.form.get('author') or None
         content = request.form['content']
         image_url = request.form.get('image_url') or None
         category_id = request.form.get('category') or None
-        create_article(title, content, category_id, image_url)
+        create_article(title, content, category_id, image_url, author)
         return redirect(url_for('articles.articles_page'))
     return render_template('create_article.html', categories=categories)
 
@@ -73,5 +74,5 @@ def api_modify_article(aid):
         ok = delete_article(aid)
         return ('', 204) if ok else ('Not found', 404)
     data = request.json
-    a = update_article(aid, data.get('title'), data.get('content'), data.get('category_id'), data.get('image_url'))
+    a = update_article(aid, data.get('title'), data.get('content'), data.get('category_id'), data.get('image_url'), data.get('author'))
     return jsonify(a.to_dict()) if a else ('Not found', 404)

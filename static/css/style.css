@@ -1543,5 +1543,139 @@ body {
     }
 }
 
+/* ==================== Page Transition Animations ==================== */
 
+/* Fade in animation for page load */
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+    to {
+        opacity: 1;
+    }
+}
 
+/* Slide in from left animation */
+@keyframes slideInFromLeft {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide in from right animation */
+@keyframes slideInFromRight {
+    from {
+        opacity: 0;
+        transform: translateX(30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+/* Slide in from top animation */
+@keyframes slideInFromTop {
+    from {
+        opacity: 0;
+        transform: translateY(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+/* Scale up animation */
+@keyframes scaleUp {
+    from {
+        opacity: 0;
+        transform: scale(0.95);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1);
+    }
+}
+
+/* Fade out animation for page exit */
+@keyframes fadeOut {
+    from {
+        opacity: 1;
+    }
+    to {
+        opacity: 0;
+    }
+}
+
+/* Apply transition animation to main content on page load */
+.main-content {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Apply transition animation to main container */
+.main-container {
+    animation: slideInFromTop 0.5s ease-out;
+}
+
+/* Page transition effect - fade to next page */
+.page-transition-out {
+    animation: fadeOut 0.3s ease-in forwards;
+}
+
+.page-transition-in {
+    animation: fadeIn 0.4s ease-out 0.1s backwards;
+}
+
+/* Sidebar page transition */
+.sidebar.page-transition {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Content section transitions */
+section {
+    animation: fadeIn 0.4s ease-out;
+}
+
+/* Card animations on page load */
+.article-card,
+.stat-card,
+.article-item {
+    animation: fadeIn 0.5s ease-out;
+}
+
+/* Stagger animation for multiple items */
+.timeline-list .article-item:nth-child(1) {
+    animation: slideInFromLeft 0.5s ease-out;
+}
+
+.timeline-list .article-item:nth-child(2) {
+    animation: slideInFromLeft 0.5s ease-out 0.1s backwards;
+}
+
+.timeline-list .article-item:nth-child(3) {
+    animation: slideInFromLeft 0.5s ease-out 0.2s backwards;
+}
+
+.timeline-list .article-item:nth-child(n+4) {
+    animation: slideInFromLeft 0.5s ease-out 0.3s backwards;
+}
+
+/* Dark mode transition */
+html.page-transition {
+    animation: fadeIn 0.3s ease-out;
+}
+
+/* Smooth page reload transition */
+body.page-reloading {
+    animation: fadeOut 0.3s ease-in forwards;
+}
+
+body.page-loading {
+    animation: fadeIn 0.4s ease-out 0.1s backwards;
+}

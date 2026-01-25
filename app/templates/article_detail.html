@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 
-{% block title %}{{ article.title }} - NewsHub{% endblock %}
+{% block title %}{{ article.title }} - News Management System{% endblock %}
 
 {% block content %}
 <div class="max-w-3xl mx-auto">
@@ -34,6 +34,12 @@
                 <div>
                     <h1 class="text-4xl font-bold text-gray-900 mb-3">{{ article.title }}</h1>
                     <div class="flex items-center space-x-4 text-gray-600">
+                        {% if article.author %}
+                        <span class="flex items-center space-x-2">
+                            <span>✍️</span>
+                            <span class="font-semibold">{{ article.author }}</span>
+                        </span>
+                        {% endif %}
                         <span class="flex items-center space-x-2">
                             <span>📅</span>
                             <span>{{ article.created_at.strftime('%B %d, %Y') if article.created_at else 'Recently' }}</span>

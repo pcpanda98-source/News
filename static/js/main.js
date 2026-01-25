@@ -99,6 +99,76 @@ document.addEventListener('DOMContentLoaded', function() {
         sidebarOverlay.addEventListener('click', toggleSidebar);
     }
 
+    // Page Transition Handler
+    const PageTransition = (function() {
+        const TRANSITION_DURATION = 300;
+        let isTransitioning = false;
+
+        function preventDefaultNavigation(e) {
+            // Only intercept internal links
+            const href = e.currentTarget.getAttribute('href');
+            
+            // Skip if link is external, has target="_blank", or is an anchor link
+            if (!href || href.startsWith('http') || href.startsWith('//') || 
+                e.currentTarget.getAttribute('target') === '_blank' || 
+                href.startsWith('#') || isTransitioning) {
+                return;
+            }
+
+            e.preventDefault();
+            navigateToPage(href);
+        }
+
+        function navigateToPage(url) {
+            if (isTransitioning) return;
+            
+            isTransitioning = true;
+            const mainContent = document.querySelector('.main-content');
+            
+            // Apply fade out animation
+            if (mainContent) {
+                mainContent.classList.add('page-transition-out');
+            }
+
+            // Navigate after animation completes
+            setTimeout(() => {
+                window.location.href = url;
+            }, TRANSITION_DURATION);
+        }
+
+        function init() {
+            // Attach click handlers to all internal links
+            document.addEventListener('click', function(e) {
+                const link = e.target.closest('a[href]');
+                if (link) {
+                    preventDefaultNavigation.call(link, e);
+                }
+            });
+
+            // Add page load animation
+            const mainContent = document.querySelector('.main-content');
+            if (mainContent) {
+                mainContent.classList.add('page-transition-in');
+            }
+
+            // Remove transition class after animation
+            setTimeout(() => {
+                if (mainContent) {
+                    mainContent.classList.remove('page-transition-in', 'page-transition-out');
+                }
+                isTransitioning = false;
+            }, TRANSITION_DURATION + 100);
+        }
+
+        return {
+            init: init,
+            navigate: navigateToPage
+        };
+    })();
+
+    // Initialize page transitions
+    PageTransition.init();
+
     // Close sidebar when a link is clicked (mobile)
     if (sidebar) {
         const sidebarLinks = sidebar.querySelectorAll('a');
@@ -292,3 +362,76 @@ window.apiGet = apiGet;
 window.apiPost = apiPost;
 window.apiPut = apiPut;
 window.apiDelete = apiDelete;
+// ==================== Page Transition Handler ====================
+const PageTransition = (function() {
+    const TRANSITION_DURATION = 300;
+    let isTransitioning = false;
+
+    function preventDefaultNavigation(e) {
+        // Only intercept internal links
+        const href = e.currentTarget.getAttribute('href');
+        
+        // Skip if link is external, has target="_blank", or is an anchor link
+        if (!href || href.startsWith('http') || href.startsWith('//') || 
+            e.currentTarget.getAttribute('target') === '_blank' || 
+            href.startsWith('#') || isTransitioning) {
+            return;
+        }
+
+        e.preventDefault();
+        navigateToPage(href);
+    }
+
+    function navigateToPage(url) {
+        if (isTransitioning) return;
+        
+        isTransitioning = true;
+        const mainContent = document.querySelector('.main-content');
+        
+        // Apply fade out animation
+        if (mainContent) {
+            mainContent.classList.add('page-transition-out');
+        }
+
+        // Navigate after animation completes
+        setTimeout(() => {
+            window.location.href = url;
+        }, TRANSITION_DURATION);
+    }
+
+    function init() {
+        // Attach click handlers to all internal links
+        document.addEventListener('click', function(e) {
+            const link = e.target.closest('a[href]');
+            if (link) {
+                preventDefaultNavigation.call(link, e);
+            }
+        });
+
+        // Add page load animation
+        const mainContent = document.querySelector('.main-content');
+        if (mainContent) {
+            mainContent.classList.add('page-transition-in');
+        }
+
+        // Remove transition class after animation
+        setTimeout(() => {
+            if (mainContent) {
+                mainContent.classList.remove('page-transition-in', 'page-transition-out');
+            }
+            isTransitioning = false;
+        }, TRANSITION_DURATION + 100);
+    }
+
+    return {
+        init: init,
+        navigate: navigateToPage
+    };
+})();
+
+// Initialize page transitions when document is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', PageTransition.init);
+} else {
+    PageTransition.init();
+}
