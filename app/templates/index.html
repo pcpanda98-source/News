@@ -113,7 +113,7 @@
 </section>
 
 <!-- Quick Stats -->
-<section class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+<section class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
     <div class="bg-white rounded-lg shadow-md p-6 text-center">
         <div class="text-4xl font-bold text-blue-600 mb-2">{{ articles|length }}</div>
         <p class="text-gray-600">Total Articles</p>
@@ -121,10 +121,6 @@
     <div class="bg-white rounded-lg shadow-md p-6 text-center">
         <div class="text-4xl font-bold text-green-600 mb-2">{{ categories|length }}</div>
         <p class="text-gray-600">Categories</p>
-    </div>
-    <div class="bg-white rounded-lg shadow-md p-6 text-center">
-        <div class="text-4xl font-bold text-purple-600 mb-2">✨</div>
-        <p class="text-gray-600">Always Fresh Content</p>
     </div>
 </section>
 {% endblock %}
