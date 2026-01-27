@@ -29,7 +29,7 @@ def latest_news():
 
 @article_bp.route('/live')
 def live_news():
-    news_api_key = 'pub_b6ea65c0579b42b5a8f61d11f2eac14f'
+    news_api_key = '7ee335fefcc3490982cb790ed9f85c8a'
     return render_template('live_news.html', news_api_key=news_api_key)
 
 

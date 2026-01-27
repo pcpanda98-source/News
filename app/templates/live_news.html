@@ -47,8 +47,8 @@
             id="sortFilter" 
             class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-red-500 bg-white"
         >
+            <option value="publishedAt">Latest First</option>
             <option value="popularity">Most Popular</option>
-            <option value="published">Latest First</option>
             <option value="relevancy">Most Relevant</option>
         </select>
         <button 
@@ -75,10 +75,10 @@
         <span>💡 Troubleshooting:</span>
     </p>
     <ul class="text-red-600 text-sm mt-2 list-disc list-inside">
-        <li>Verify your newsdata.io API key is valid</li>
-        <li>Check your API key at <a href="https://newsdata.io" target="_blank" class="underline">newsdata.io</a></li>
+        <li>Verify your NewsApi.org API key is valid</li>
+        <li>Check your API key at <a href="https://newsapi.org" target="_blank" class="underline">newsapi.org</a></li>
         <li>Ensure you have a valid subscription plan</li>
-        <li>Check your API usage quota</li>
+        <li>Check your API usage quota (free tier: 100 requests/day)</li>
     </ul>
 </div>
 
@@ -107,17 +107,15 @@
 </div>
 
 {% endblock %}
-
 {% block scripts %}
 <script>
 // API Configuration
-const NEWS_API_KEY = '{{ news_api_key }}';
-const NEWS_API_URL = 'https://newsdata.io/api/1';
+const BACKEND_API_URL = '/api';
 
 let currentPage = 1;
 let currentQuery = '';
 let currentCategory = '';
-let currentSort = 'popularity';
+let currentSort = 'publishedAt';
 let allArticles = [];
 
 // Load initial live news
@@ -139,20 +137,26 @@ function loadLiveNews() {
     currentCategory = '';
     allArticles = [];
     
-    // Fetch latest news
-    const url = `${NEWS_API_URL}/latest?country=us&apikey=${NEWS_API_KEY}`;
+    // Fetch latest news from backend API
+    const params = new URLSearchParams({
+        country: 'us',
+        pageSize: 10,
+        page: currentPage
+    });
+    if (currentCategory) params.append('category', currentCategory);
+    
+    const url = `${BACKEND_API_URL}/live?${params}`;
     
     fetch(url, {
         method: 'GET',
         headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'Accept': 'application/json'
         }
     })
         .then(response => {
             if (!response.ok) {
                 if (response.status === 401) {
-                    throw new Error('⚠️ Invalid or Unauthorized API Key. Please check your newsdata.io API key.');
+                    throw new Error('⚠️ Invalid or Unauthorized API Key. Please check your NewsApi.org API key.');
                 } else if (response.status === 429) {
                     throw new Error('⏱️ API rate limit exceeded. Please try again later.');
                 } else if (response.status === 400) {
@@ -163,8 +167,8 @@ function loadLiveNews() {
             return response.json();
         })
         .then(data => {
-            if (data.status === 'success') {
-                allArticles = data.results || [];
+            if (data.status === 'ok') {
+                allArticles = data.articles || [];
                 displayArticles(allArticles);
                 showLoading(false);
                 
@@ -198,13 +202,19 @@ function searchNews() {
     currentQuery = query;
     allArticles = [];
     
-    const url = `${NEWS_API_URL}/latest?q=${encodeURIComponent(query)}&sort_by=${currentSort}&pagesize=20&apikey=${NEWS_API_KEY}`;
+    const params = new URLSearchParams({
+        q: query,
+        sortBy: currentSort,
+        pageSize: 20,
+        page: currentPage
+    });
+    
+    const url = `${BACKEND_API_URL}/search?${params}`;
     
     fetch(url, {
         method: 'GET',
         headers: {
-            'Accept': 'application/json',
-            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
+            'Accept': 'application/json'
         }
     })
         .then(response => {
@@ -214,8 +224,8 @@ function searchNews() {
             return response.json();
         })
         .then(data => {
-            if (data.status === 'success') {
-                allArticles = data.results || [];
+            if (data.status === 'ok') {
+                allArticles = data.articles || [];
                 displayArticles(allArticles);
             } else {
                 throw new Error(data.message || 'No results found');
@@ -240,7 +250,13 @@ function filterNews() {
         currentPage = 1;
         allArticles = [];
         
-        const url = `${NEWS_API_URL}/latest?category=${category}&country=us&pagesize=20&apikey=${NEWS_API_KEY}`;
+        const params = new URLSearchParams({
+            category: category,
+            country: 'us',
+            pageSize: 20,
+            page: currentPage
+        });
+        const url = `${BACKEND_API_URL}/live?${params}`;
         
         fetch(url)
             .then(response => {
@@ -281,12 +297,22 @@ function loadMoreNews() {
     showLoading(true);
     
     let url;
+    const params = new URLSearchParams({
+        page: currentPage,
+        pageSize: 20
+    });
+    
     if (currentQuery) {
-        url = `${NEWS_API_URL}/latest?q=${encodeURIComponent(currentQuery)}&sort_by=${currentSort}&page=${currentPage}&pagesize=20&apikey=${NEWS_API_KEY}`;
+        params.append('q', currentQuery);
+        params.append('sortBy', currentSort);
+        url = `${BACKEND_API_URL}/search?${params}`;
     } else if (currentCategory) {
-        url = `${NEWS_API_URL}/latest?category=${currentCategory}&country=us&page=${currentPage}&pagesize=20&apikey=${NEWS_API_KEY}`;
+        params.append('category', currentCategory);
+        params.append('country', 'us');
+        url = `${BACKEND_API_URL}/live?${params}`;
     } else {
-        url = `${NEWS_API_URL}/latest?country=us&page=${currentPage}&pagesize=20&apikey=${NEWS_API_KEY}`;
+        params.append('country', 'us');
+        url = `${BACKEND_API_URL}/live?${params}`;
     }
     
     fetch(url)
@@ -295,8 +321,8 @@ function loadMoreNews() {
             return response.json();
         })
         .then(data => {
-            if (data.status === 'success') {
-                const newArticles = data.results || [];
+            if (data.status === 'ok') {
+                const newArticles = data.articles || [];
                 allArticles = [...allArticles, ...newArticles];
                 appendArticles(newArticles);
             }
@@ -335,9 +361,9 @@ function appendArticles(articles) {
 }
 
 function createArticleCard(article) {
-    const imageUrl = article.image_url || article.image || 'https://via.placeholder.com/400x200?text=No+Image';
-    const source = article.source_id || article.source || 'Unknown Source';
-    const publishedDate = new Date(article.pubDate || article.publishedAt);
+    const imageUrl = article.urlToImage || article.image || 'https://via.placeholder.com/400x200?text=No+Image';
+    const source = article.source && article.source.name ? article.source.name : (article.source_id || article.source || 'Unknown Source');
+    const publishedDate = new Date(article.publishedAt || article.pubDate);
     const formattedDate = publishedDate.toLocaleDateString('en-US', { 
         year: 'numeric', 
         month: 'short', 
@@ -348,7 +374,7 @@ function createArticleCard(article) {
     
     const description = article.description ? article.description.substring(0, 150) + '...' : 'No description available';
     const title = article.title ? article.title.substring(0, 70) : 'Untitled';
-    const link = article.link || article.url || '#';
+    const link = article.url || article.link || '#';
     
     return `
         <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition duration-300 hover:-translate-y-1">
@@ -430,3 +456,4 @@ function debounce(func, delay) {
 }
 </script>
 {% endblock %}
+

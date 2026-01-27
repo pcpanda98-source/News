@@ -17,10 +17,11 @@ def create_app():
     if os.getenv('DATABASE_URL'):
         db_uri = os.getenv('DATABASE_URL')
     else:
-        instance_path = os.path.join(os.path.dirname(__file__), '..', 'instance')
+        instance_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'instance'))
         os.makedirs(instance_path, exist_ok=True)
         db_path = os.path.join(instance_path, 'news.db')
-        db_uri = f'sqlite:///{db_path}'
+        # Use proper SQLite URI format for absolute paths
+        db_uri = 'sqlite:///' + db_path
     
     app.config['SQLALCHEMY_DATABASE_URI'] = db_uri
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
