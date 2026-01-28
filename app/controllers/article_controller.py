@@ -27,8 +27,9 @@ def latest_news():
     return render_template('latest.html', articles=articles, categories=categories)
 
 
-@article_bp.route('/live')
-def live_news():
+@article_bp.route('/live-feed')
+def live_feed():
+    """Show live news feed from external API"""
     news_api_key = '7ee335fefcc3490982cb790ed9f85c8a'
     return render_template('live_news.html', news_api_key=news_api_key)
 
