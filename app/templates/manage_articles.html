@@ -7,15 +7,11 @@
     <div class="mb-8 flex items-center justify-between">
         <div>
             <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-                <svg class="w-10 h-10 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"></path>
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path>
-                </svg>
-                Manage Articles
+                📄 Manage Articles
             </h1>
             <p class="text-gray-600 text-lg">View, edit, and manage all articles</p>
         </div>
-        <a href="/articles/create" class="bg-gray-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-flex items-center space-x-2">
+        <a href="/articles/create" class="bg-green-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-green-700 hover:scale-105 transition-all duration-200 inline-flex items-center space-x-2">
             <span>➕</span>
             <span>Create New Article</span>
         </a>
@@ -49,9 +45,9 @@
             </select>
             <button 
                 onclick="resetFilters()" 
-                class="bg-gray-600 text-white px-4 py-2 rounded-lg hover:bg-gray-700 transition duration-200"
+                class="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600 hover:scale-105 transition-all duration-200 flex items-center gap-1"
             >
-                Reset Filters
+                🔄 Reset Filters
             </button>
         </div>
     </div>
@@ -59,7 +55,7 @@
     <!-- Articles Management Table -->
     <div class="bg-white rounded-lg shadow-lg overflow-hidden">
         <div class="bg-gray-50 px-8 py-4 border-b border-gray-200 flex items-center justify-between">
-            <h2 class="text-2xl font-bold text-gray-900">All Articles</h2>
+            <h2 class="text-2xl font-bold text-gray-900 flex items-center gap-2">📊 All Articles</h2>
             <span class="text-sm text-gray-600">Total: <span id="totalCount">{{ articles|length }}</span></span>
         </div>
 
@@ -192,8 +188,8 @@
 
     <!-- Back Link -->
     <div class="mt-8">
-        <a href="/articles" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-2">
-            <span>←</span>
+        <a href="/articles" class="text-blue-600 hover:text-blue-800 font-semibold flex items-center space-x-2 hover:translate-x-1 transition-transform duration-200">
+            <span>⬅️</span>
             <span>Back to Articles</span>
         </a>
     </div>
@@ -203,7 +199,7 @@
 <div id="editModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 overflow-y-auto p-4">
     <div class="bg-white rounded-lg shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
         <div class="sticky top-0 bg-white border-b border-gray-200 px-8 py-4">
-            <h3 class="text-2xl font-bold text-gray-900">Edit Article</h3>
+            <h3 class="text-2xl font-bold text-gray-900">✏️ Edit Article</h3>
         </div>
         <div class="p-8">
             <form id="editForm" onsubmit="submitEdit(event)">

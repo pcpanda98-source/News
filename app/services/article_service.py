@@ -7,7 +7,7 @@ def list_articles():
     return Article.query.order_by(Article.created_at.desc()).all()
 
 def get_article(article_id):
-    return Article.query.get(article_id)
+    return db.session.get(Article, article_id)
 
 def create_article(title, content, category_id=None, image_url=None, author=None):
     a = Article(title=title, author=author, content=content, category_id=category_id, image_url=image_url)

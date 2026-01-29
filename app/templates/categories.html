@@ -6,14 +6,11 @@
 <div class="flex flex-col md:flex-row md:items-center md:justify-between mb-8">
     <div>
         <h1 class="text-4xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-            <svg class="w-10 h-10 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.99 1.99 0 013 12V7a2 2 0 012-2z"></path>
-            </svg>
-            All Categories
+            🏷️ All Categories
         </h1>
         <p class="text-gray-600 text-lg">Browse articles by category</p>
     </div>
-    <a href="/categories/manage" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-200 inline-block mt-4 md:mt-0">
+    <a href="/categories/manage" class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 hover:scale-105 transition-all duration-200 inline-block mt-4 md:mt-0">
         ⚙️ Manage Categories
     </a>
 </div>
@@ -22,7 +19,7 @@
 {% if categories %}
 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
     {% for category in categories %}
-    <div class="bg-white rounded-lg shadow-md hover:shadow-lg transition duration-200 overflow-hidden group cursor-pointer">
+    <div class="bg-white rounded-lg shadow-md hover:shadow-lg hover:scale-105 transition-all duration-200 overflow-hidden group cursor-pointer">
         <div class="bg-gradient-to-r from-purple-400 to-purple-600 h-32 flex items-center justify-center group-hover:from-purple-500 group-hover:to-purple-700 transition duration-200">
             <span class="text-5xl">📂</span>
         </div>
@@ -37,7 +34,7 @@
                 </span>
                 <a 
                     href="/articles?category={{ category.id }}" 
-                    class="text-purple-600 font-semibold hover:text-purple-800 transition duration-200"
+                    class="text-purple-600 font-semibold hover:text-purple-800 hover:translate-x-1 transition-all duration-200"
                 >
                     Browse →
                 </a>
@@ -53,10 +50,11 @@
 
 {% else %}
 <div class="bg-gray-100 rounded-lg p-12 text-center mb-8">
+    <div class="text-6xl mb-4">📂</div>
     <p class="text-gray-600 text-lg mb-4">No categories available yet.</p>
     <a 
         href="/categories/manage" 
-        class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 transition duration-200 inline-block"
+        class="bg-green-600 text-white px-6 py-2 rounded-lg font-semibold hover:bg-green-700 hover:scale-105 transition-all duration-200 inline-block"
     >
         Create First Category
     </a>
