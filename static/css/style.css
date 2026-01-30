@@ -364,12 +364,32 @@ body {
     padding: 0.75rem 1rem;
     border-radius: 0.5rem;
     transition: all 0.2s ease;
-    color: var(--text-secondary);
+    color: #111827;
+    font-weight: 700;
 }
 
 .sidebar-link:hover {
     background-color: var(--bg-tertiary);
-    color: var(--text-primary);
+    color: #111827;
+}
+
+.dark .sidebar-link:hover {
+    color: #ffffff;
+}
+
+.sidebar-link span {
+    color: #111827;
+    font-weight: 700;
+}
+
+/* Dark mode sidebar link text color */
+.dark .sidebar-link span {
+    color: #ffffff !important;
+    font-weight: 700 !important;
+}
+
+.dark .sidebar-link {
+    color: #ffffff !important;
 }
 
 .sidebar-link svg {
@@ -378,7 +398,11 @@ body {
 }
 
 .sidebar-link:hover svg {
-    color: var(--text-primary);
+    color: #111827;
+}
+
+.dark .sidebar-link:hover svg {
+    color: #ffffff;
 }
 
 /* Live news link */
@@ -713,11 +737,11 @@ body {
 
 /* Navigation text colors in dark mode */
 .dark nav a {
-    color: var(--text-secondary);
+    color: #ffffff;
 }
 
 .dark nav a:hover {
-    color: var(--text-primary);
+    color: #ffffff;
 }
 
 /* Navigation hover states */
@@ -976,8 +1000,18 @@ body {
     color: #ffffff !important;
 }
 
+.sidebar-link.bg-gray-600 span,
+.sidebar-link.bg-gray-700 span {
+    color: #ffffff !important;
+}
+
 .sidebar-link.bg-gray-600:hover,
 .sidebar-link.bg-gray-700:hover {
+    color: #ffffff !important;
+}
+
+.sidebar-link.bg-gray-600:hover span,
+.sidebar-link.bg-gray-700:hover span {
     color: #ffffff !important;
 }
 

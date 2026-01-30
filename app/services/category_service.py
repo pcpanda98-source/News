@@ -2,7 +2,7 @@ from app.models.category import Category
 from app.models.db import db
 
 def list_categories():
-    return Category.query.order_by(Category.name).all()
+    return Category.query.order_by(Category.id).all()
 
 def get_category(cat_id):
     return db.session.get(Category, cat_id)
