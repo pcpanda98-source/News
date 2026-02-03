@@ -59,7 +59,7 @@
             type="text" 
             id="searchInput" 
             placeholder="Search articles..." 
-            value="{{ search_term }}"
+            value="{{ search_term or '' }}"
             class="px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 focus-glow"
         >
         <select 
@@ -84,11 +84,14 @@
 </div>
 
 <!-- Articles Grid -->
-<!-- DEBUG: Articles count = {{ articles|length }} -->
 {% if articles %}
 <div id="articlesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
 {% for article in articles %}
-    <div class="article-card-modern bg-white rounded-xl shadow-md overflow-hidden article-card-animate tile-interactive" data-title="{{ article.title|lower }}" data-category="{{ article.category.name if article.category else ''|lower }}" data-author="{{ article.author|lower if article.author else '' }}" data-content="{{ article.content[:200]|lower }}">
+    <div class="article-card-modern bg-white rounded-xl shadow-md overflow-hidden article-card-animate tile-interactive" 
+         data-title="{{ article.title|lower }}" 
+         data-category="{{ article.category.name if article.category else ''|lower }}" 
+         data-author="{{ article.author|lower if article.author else '' }}" 
+         data-content="{{ article.content[:200]|lower }}">
         <div class="article-card-image relative">
             {% if article.image_url %}
             <div class="h-48 overflow-hidden">
@@ -145,10 +148,10 @@
             </a>
         </div>
     </div>
-    {% endfor %}
+{% endfor %}
 </div>
 
-<!-- Empty State Message (Hidden by default) -->
+<!-- Empty State Message -->
 <div id="emptyState" class="hidden bg-gray-100 rounded-lg p-12 text-center">
     <p class="text-gray-600 text-lg mb-4">No articles found matching your search.</p>
     <button 
@@ -183,7 +186,7 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/state.js') }}"></script>
 <script>
-// Search and Filter Functionality
+// Get DOM elements
 const searchInput = document.getElementById('searchInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const articlesContainer = document.getElementById('articlesContainer');
@@ -191,17 +194,17 @@ const emptyState = document.getElementById('emptyState');
 const articleCount = document.getElementById('articleCount');
 const articleCards = document.querySelectorAll('.article-card-modern');
 
-// Filter articles based on search and category
+// Filter articles function
 function filterArticles() {
     const searchTerm = searchInput.value.toLowerCase().trim();
     const selectedCategory = categoryFilter.value.toLowerCase().trim();
     let visibleCount = 0;
 
     articleCards.forEach(card => {
-        const title = card.dataset.title || '';
-        const category = card.dataset.category || '';
-        const author = card.dataset.author || '';
-        const content = card.dataset.content || '';
+        const title = card.getAttribute('data-title') || '';
+        const category = card.getAttribute('data-category') || '';
+        const author = card.getAttribute('data-author') || '';
+        const content = card.getAttribute('data-content') || '';
         
         const matchesSearch = !searchTerm || 
             title.includes(searchTerm) || 
@@ -213,15 +216,14 @@ function filterArticles() {
         
         if (matchesSearch && matchesCategory) {
             card.style.display = 'block';
-            card.style.animation = 'fadeIn 0.3s ease-in';
             visibleCount++;
         } else {
             card.style.display = 'none';
         }
     });
 
-    // Update UI based on results
-    if (visibleCount === 0) {
+    // Update UI
+    if (visibleCount === 0 && articleCards.length > 0) {
         articlesContainer.style.display = 'none';
         emptyState.classList.remove('hidden');
     } else {
@@ -235,14 +237,15 @@ function filterArticles() {
     }
 }
 
-// Reset all filters
+// Reset filters function
 function resetFilters() {
     searchInput.value = '';
     categoryFilter.value = '';
     filterArticles();
+    window.history.replaceState({}, document.title, '/articles');
 }
 
-// Category filter redirect
+// Category filter with URL update
 function filterByCategory() {
     const selectedCategory = categoryFilter.value;
     if (selectedCategory) {
@@ -252,7 +255,7 @@ function filterByCategory() {
     }
 }
 
-// Debounce function for better performance
+// Debounce function
 function debounce(func, wait) {
     let timeout;
     return function executedFunction(...args) {
@@ -265,138 +268,20 @@ function debounce(func, wait) {
     };
 }
 
-// Create debounced version of filter function
+// Create debounced filter
 const debouncedFilter = debounce(filterArticles, 300);
 
 // Event listeners
-searchInput.addEventListener('input', debouncedFilter);
-categoryFilter.addEventListener('change', filterByCategory);
+if (searchInput) {
+    searchInput.addEventListener('input', debouncedFilter);
+}
+if (categoryFilter) {
+    categoryFilter.addEventListener('change', filterByCategory);
+}
 
 // Initialize on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Add CSS for animations
-    const style = document.createElement('style');
-    style.textContent = `
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .article-card-modern {
-            transition: all 0.3s ease;
-        }
-    `;
-    document.head.appendChild(style);
-    
-    // If there's a search term in URL, apply it
-    const urlParams = new URLSearchParams(window.location.search);
-    const searchParam = urlParams.get('search');
-    if (searchParam) {
-        searchInput.value = searchParam;
-        filterArticles();
-    }
-    
-    // Initial filter on page load
     filterArticles();
-});
-</script>cument.querySelectorAll('.article-card-animate');
-
-// Debounce function for better performance
-function debounce(func, delay) {
-    let timeoutId;
-    return function(...args) {
-        clearTimeout(timeoutId);
-        timeoutId = setTimeout(() => func.apply(this, args), delay);
-    };
-}
-
-// Enhanced filter function with visual feedback
-function filterArticles() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    const selectedCategory = categoryFilter.value.toLowerCase();
-    let visibleCount = 0;
-
-    articleCards.forEach((card, index) => {
-        const title = card.dataset.title || '';
-        const category = card.dataset.category || '';
-        
-        // Case-insensitive matching
-        const matchesSearch = !searchTerm || title.includes(searchTerm);
-        const matchesCategory = !selectedCategory || category === selectedCategory;
-        
-        if (matchesSearch && matchesCategory) {
-            card.style.display = '';
-            card.style.opacity = '0';
-            card.style.transform = 'translateY(20px)';
-            
-            // Staggered animation
-            setTimeout(() => {
-                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            }, index * 50);
-            
-            visibleCount++;
-        } else {
-            card.style.display = 'none';
-        }
-    });
-
-    // Update UI based on results
-    if (visibleCount === 0) {
-        articlesContainer.style.display = 'none';
-        emptyState.classList.remove('hidden');
-    } else {
-        articlesContainer.style.display = 'grid';
-        emptyState.classList.add('hidden');
-    }
-
-    // Update article count with animation
-    const countElement = document.getElementById('articleCount');
-    if (countElement) {
-        countElement.style.opacity = '0';
-        setTimeout(() => {
-            countElement.textContent = visibleCount;
-            countElement.style.transition = 'opacity 0.3s ease';
-            countElement.style.opacity = '1';
-        }, 100);
-    }
-}
-
-function resetFilters() {
-    searchInput.value = '';
-    categoryFilter.value = '';
-    
-    // Visual feedback for reset
-    searchInput.classList.add('ring-2', 'ring-blue-500');
-    setTimeout(() => {
-        searchInput.classList.remove('ring-2', 'ring-blue-500');
-    }, 500);
-    
-    filterArticles();
-    
-    // Update URL to remove category filter
-    const url = new URL(window.location);
-    url.searchParams.delete('category');
-    window.history.replaceState({}, '', url);
-}
-
-// Create debounced filter function (300ms delay)
-const debouncedFilter = debounce(filterArticles, 300);
-
-// Event listeners with debounced search
-searchInput.addEventListener('input', debouncedFilter);
-categoryFilter.addEventListener('change', filterArticles);
-
-// Initialize on page load
-document.addEventListener('DOMContentLoaded', () => {
-    filterArticles();
-    
-    // Focus search input if there's a search term in URL
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('search')) {
-        searchInput.value = urlParams.get('search');
-        filterArticles();
-    }
 });
 </script>
 {% endblock %}
