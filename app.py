@@ -1,8 +1,10 @@
 from app import create_app
 import os
 
+# Create app instance for Gunicorn
+app = create_app()
+
 if __name__ == '__main__':
-    app = create_app()
     cert = os.getenv('SSL_CERT')
     key = os.getenv('SSL_KEY')
     if cert and key:
