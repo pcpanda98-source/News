@@ -67,7 +67,7 @@
         >
             <option value="">All Categories</option>
             {% for cat in categories %}
-            <option value="{{ cat.name }}" {% if selected_category == cat.id|string %}selected{% endif %}>{{ cat.name }}</option>
+            <option value="{{ cat.name }}" {% if selected_category == cat.name %}selected{% endif %}>{{ cat.name }}</option>
             {% endfor %}
         </select>
         <button 
@@ -182,33 +182,55 @@
 {% block scripts %}
 <script src="{{ url_for('static', filename='js/state.js') }}"></script>
 <script>
-// Search and Filter Functionality
+// Search and Filter Functionality with Debouncing
 const searchInput = document.getElementById('searchInput');
 const categoryFilter = document.getElementById('categoryFilter');
 const articlesContainer = document.getElementById('articlesContainer');
 const emptyState = document.getElementById('emptyState');
 const articleCards = document.querySelectorAll('.article-card-animate');
 
+// Debounce function for better performance
+function debounce(func, delay) {
+    let timeoutId;
+    return function(...args) {
+        clearTimeout(timeoutId);
+        timeoutId = setTimeout(() => func.apply(this, args), delay);
+    };
+}
+
+// Enhanced filter function with visual feedback
 function filterArticles() {
-    const searchTerm = searchInput.value.toLowerCase();
+    const searchTerm = searchInput.value.toLowerCase().trim();
     const selectedCategory = categoryFilter.value.toLowerCase();
     let visibleCount = 0;
 
-    articleCards.forEach(card => {
-        const title = card.dataset.title;
-        const category = card.dataset.category;
+    articleCards.forEach((card, index) => {
+        const title = card.dataset.title || '';
+        const category = card.dataset.category || '';
         
-        const matchesSearch = title.includes(searchTerm);
-        const matchesCategory = !selectedCategory || category.includes(selectedCategory);
+        // Case-insensitive matching
+        const matchesSearch = !searchTerm || title.includes(searchTerm);
+        const matchesCategory = !selectedCategory || category === selectedCategory;
         
         if (matchesSearch && matchesCategory) {
             card.style.display = '';
+            card.style.opacity = '0';
+            card.style.transform = 'translateY(20px)';
+            
+            // Staggered animation
+            setTimeout(() => {
+                card.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
+            }, index * 50);
+            
             visibleCount++;
         } else {
             card.style.display = 'none';
         }
     });
 
+    // Update UI based on results
     if (visibleCount === 0) {
         articlesContainer.style.display = 'none';
         emptyState.classList.remove('hidden');
@@ -217,21 +239,53 @@ function filterArticles() {
         emptyState.classList.add('hidden');
     }
 
-    document.getElementById('articleCount').textContent = visibleCount;
+    // Update article count with animation
+    const countElement = document.getElementById('articleCount');
+    if (countElement) {
+        countElement.style.opacity = '0';
+        setTimeout(() => {
+            countElement.textContent = visibleCount;
+            countElement.style.transition = 'opacity 0.3s ease';
+            countElement.style.opacity = '1';
+        }, 100);
+    }
 }
 
 function resetFilters() {
     searchInput.value = '';
     categoryFilter.value = '';
+    
+    // Visual feedback for reset
+    searchInput.classList.add('ring-2', 'ring-blue-500');
+    setTimeout(() => {
+        searchInput.classList.remove('ring-2', 'ring-blue-500');
+    }, 500);
+    
     filterArticles();
+    
+    // Update URL to remove category filter
+    const url = new URL(window.location);
+    url.searchParams.delete('category');
+    window.history.replaceState({}, '', url);
 }
 
-searchInput.addEventListener('input', filterArticles);
+// Create debounced filter function (300ms delay)
+const debouncedFilter = debounce(filterArticles, 300);
+
+// Event listeners with debounced search
+searchInput.addEventListener('input', debouncedFilter);
 categoryFilter.addEventListener('change', filterArticles);
 
-// Load initial state
+// Initialize on page load
 document.addEventListener('DOMContentLoaded', () => {
     filterArticles();
+    
+    // Focus search input if there's a search term in URL
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('search')) {
+        searchInput.value = urlParams.get('search');
+        filterArticles();
+    }
 });
 </script>
 {% endblock %}
