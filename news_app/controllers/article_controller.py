@@ -15,19 +15,31 @@ def home():
 
 @article_bp.route('/articles')
 def articles_page():
-    category_name = request.args.get('category')
+    category_param = request.args.get('category')
     search_term = request.args.get('search')
     
-    if category_name:
-        # Find category by name
-        categories = list_categories()
-        category = next((cat for cat in categories if cat.name == category_name), None)
-        if category:
-            articles = list_articles_by_category(category.id)
-            selected_category = category.name
+    selected_category = ''
+    
+    if category_param:
+        # First try to find category by ID (if parameter is numeric)
+        if category_param.isdigit():
+            category = get_category(int(category_param))
+            if category:
+                articles = list_articles_by_category(category.id)
+                selected_category = category.name
+            else:
+                articles = list_articles()
+                selected_category = ''
         else:
-            articles = list_articles()
-            selected_category = ''
+            # Try to find category by name
+            categories = list_categories()
+            category = next((cat for cat in categories if cat.name == category_param), None)
+            if category:
+                articles = list_articles_by_category(category.id)
+                selected_category = category.name
+            else:
+                articles = list_articles()
+                selected_category = ''
     else:
         articles = list_articles()
         selected_category = ''
