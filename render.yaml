@@ -3,13 +3,13 @@ services:
     name: news-app
     env: python
     buildCommand: pip install -r requirements.txt && python render_deploy.py
-    startCommand: gunicorn news_app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
     envVars:
-      - key: DATABASE_URL
+      - key: postgresql://news_db_28y1_user:ECh5Rm8CZED6yJKvOPop1JPbmQNhM6fO@dpg-d6147m1r0fns73cbsiv0-a/news_db_28y1
         fromDatabase:
           name: news-db
           property: connectionString
-      - key: SECRET_KEY
+      - key: ECh5Rm8CZED6yJKvOPop1JPbmQNhM6fO
         generateValue: true
       - key: NEWS_API_KEY
         fromSecret: news-api-key
