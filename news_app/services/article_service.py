@@ -33,11 +33,19 @@ def update_article(article_id, title, content, category_id=None, image_url=None,
     db.session.commit()
     return a
 
+def reorder_article_ids():
+    """Reassign article IDs in ascending order starting from 1 to eliminate gaps"""
+    articles = Article.query.order_by(Article.id).all()
+    for index, article in enumerate(articles, start=1):
+        article.id = index
+    db.session.commit()
+
 def delete_article(article_id):
     a = get_article(article_id)
     if not a:
         return False
     db.session.delete(a)
     db.session.commit()
+    reorder_article_ids()
     return True
 

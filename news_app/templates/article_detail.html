@@ -5,7 +5,7 @@
 {% block content %}
 <div class="max-w-3xl mx-auto scale-in">
     <!-- Back Button -->
-    <a href="/articles" class="text-blue-600 hover:text-blue-800 font-semibold mb-6 inline-flex items-center hover-underline transition duration-200">
+    <a href="/articles" class="text-indigo-600 hover:text-indigo-800 font-semibold mb-6 inline-flex items-center hover-underline transition duration-200">
         ← Back to Articles
     </a>
 
@@ -18,11 +18,11 @@
                 src="{{ article.image_url }}" 
                 alt="{{ article.title }}"
                 class="w-full h-full object-cover"
-                onerror="this.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-blue-500 to-blue-700 h-64 flex items-center justify-center\'><span class=\'text-8xl\'>📰</span></div>'"
+                onerror="this.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-indigo-500 to-indigo-700 h-64 flex items-center justify-center\'><span class=\'text-8xl\'>📰</span></div>'"
             >
         </div>
         {% else %}
-        <div class="bg-gradient-to-r from-blue-500 to-blue-700 h-64 flex items-center justify-center zoom-subtle">
+        <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-64 flex items-center justify-center zoom-subtle">
             <span class="text-8xl">📰</span>
         </div>
         {% endif %}
@@ -53,7 +53,7 @@
                     </div>
                 </div>
                 {% if article.category %}
-                <div class="bg-blue-100 text-blue-800 px-4 py-2 rounded-full font-semibold badge-animate">
+                <div class="bg-indigo-100 text-indigo-800 px-4 py-2 rounded-full font-semibold badge-animate">
                     {{ article.category.name }}
                 </div>
                 {% endif %}
@@ -77,7 +77,7 @@
                     </a>
                     <a 
                         href="/articles/create" 
-                        class="px-6 py-3 bg-gray-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition duration-200 hover:scale-105 transform text-center"
+                        class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition duration-200 hover:scale-105 transform text-center"
                     >
                         Create New Article
                     </a>
@@ -89,7 +89,7 @@
 <!-- Related Articles Section -->
     <section class="mt-16">
         <h2 class="text-2xl font-bold text-gray-900 mb-6 section-header-animate flex items-center gap-3">
-            <svg class="w-7 h-7 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="w-7 h-7 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z"></path>
             </svg>
             Related Articles
@@ -105,7 +105,7 @@
                     <h3 class="text-lg font-bold text-gray-900">Latest Articles</h3>
                 </div>
                 <p class="text-gray-600 text-sm mb-4">Stay updated with the freshest content from our platform.</p>
-                <a href="/articles" class="text-blue-600 font-semibold hover:text-blue-800 flex items-center gap-1 transition duration-200 group">
+                <a href="/articles" class="text-indigo-600 font-semibold hover:text-indigo-800 flex items-center gap-1 transition duration-200 group">
                     Explore More 
                     <span class="group-hover:translate-x-1 transition-transform">→</span>
                 </a>

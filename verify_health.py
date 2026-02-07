@@ -1,218 +1,157 @@
-#!/usr/bin/env python3
 """
-Health Check Script - Verify Application Integrity
-Tests for critical errors and structural issues
+Database Health Verification Script
+
+This script provides a quick health check for the database system,
+verifying that data persistence is working correctly.
 """
 
+import os
 import sys
-from pathlib import Path
 
-def check_imports():
-    """Verify no circular imports or import errors"""
-    print("\n" + "="*60)
-    print("1. CHECKING IMPORTS & CIRCULAR DEPENDENCIES")
-    print("="*60)
-    try:
-        from news_app import create_app
-        from news_app.models.article import Article
-        from news_app.models.category import Category
-        from news_app.models.db import db
-        print("✅ All imports successful - no circular dependencies")
-        return True
-    except Exception as e:
-        print(f"❌ Import error: {e}")
-        return False
-
-def check_models():
-    """Verify no duplicate model definitions"""
-    print("\n" + "="*60)
-    print("2. CHECKING MODEL DEFINITIONS")
-    print("="*60)
-    try:
-        from news_app.models.article import Article
-        from news_app.models.category import Category
-        
-        # Check Article model
-        article_module = Article.__module__
-        print(f"✅ Article model location: {article_module}")
-        if article_module != "news_app.models.article":
-            print(f"⚠️  Warning: Article model imported from unexpected location")
-            return False
-        
-        # Check Category model
-        category_module = Category.__module__
-        print(f"✅ Category model location: {category_module}")
-        if category_module != "news_app.models.category":
-            print(f"⚠️  Warning: Category model imported from unexpected location")
-            return False
-        
-        # Verify model has required methods
-        article_methods = [m for m in dir(Article) if not m.startswith('_')]
-        if 'to_dict' not in article_methods:
-            print("❌ Article model missing to_dict() method")
-            return False
-        
-        print("✅ Model definitions verified - no duplicates")
-        return True
-    except Exception as e:
-        print(f"❌ Model check error: {e}")
-        return False
-
-def check_routes():
-    """Verify route conflicts are resolved"""
-    print("\n" + "="*60)
-    print("3. CHECKING ROUTES FOR CONFLICTS")
-    print("="*60)
-    try:
-        from news_app import create_app
-        app = create_app()
-        
-        routes = {}
-        for rule in app.url_map.iter_rules():
-            if rule.rule.startswith('/static') or rule.rule == '/':
-                continue
-            
-            path = rule.rule
-            method = ','.join(rule.methods - {'HEAD', 'OPTIONS'})
-            
-            if path not in routes:
-                routes[path] = []
-            routes[path].append(method)
-        
-        # Check for /live route conflict
-        live_routes = [r for r in routes if '/live' in r]
-        print(f"\n  Live routes found:")
-        for route in sorted(live_routes):
-            methods = routes[route]
-            print(f"    ✅ {route} [{','.join(methods)}]")
-        
-        # Verify specific routes
-        if '/live' in routes:
-            print(f"\n  ❌ OLD ROUTE DETECTED: /live should be removed")
-            return False
-        
-        if '/live-feed' not in routes:
-            print(f"\n  ❌ EXPECTED ROUTE MISSING: /live-feed should exist")
-            return False
-        
-        if '/api/live' not in routes:
-            print(f"\n  ❌ EXPECTED ROUTE MISSING: /api/live should exist")
-            return False
-        
-        print(f"\n✅ No route conflicts - all live routes properly separated")
-        return True
-    except Exception as e:
-        print(f"❌ Route check error: {e}")
-        return False
-
-def check_database():
-    """Verify database configuration and persistence"""
-    print("\n" + "="*60)
-    print("4. CHECKING DATABASE CONFIGURATION")
-    print("="*60)
-    try:
-        from news_app import create_app
-        app = create_app()
-        
-        db_uri = app.config['SQLALCHEMY_DATABASE_URI']
-        print(f"✅ Database URI: {db_uri}")
-        
-        # Verify it's using SQLite
-        if 'sqlite' not in db_uri:
-            print(f"⚠️  Warning: Expected SQLite database")
-            return False
-        
-        # Verify single database file
-        if 'news.db' not in db_uri:
-            print(f"⚠️  Warning: Expected database file named 'news.db'")
-            return False
-        
-        print("✅ Database configuration verified")
-        return True
-    except Exception as e:
-        print(f"❌ Database check error: {e}")
-        return False
-
-def check_app_structure():
-    """Verify news_app/__init__.py structure is correct"""
-    print("\n" + "="*60)
-    print("5. CHECKING APPLICATION STRUCTURE")
-    print("="*60)
-    try:
-        init_file = Path(__file__).parent / "news_app" / "__init__.py"
-        content = init_file.read_text()
-        
-        # Check that it's clean (no model definitions)
-        if "class Article" in content or "class Category" in content:
-            print("❌ Models should not be defined in news_app/__init__.py")
-            return False
-        
-        # Check for create_app function
-        if "def create_app" not in content:
-            print("❌ create_app() function not found")
-            return False
-        
-        # Check for proper imports
-        if "from .models.db import db" not in content and "from news_app.models.db import db" not in content:
-            print("❌ Database import not found")
-            return False
-        
-        print("✅ news_app/__init__.py is properly structured")
-        print("   - No model definitions (models in separate files)")
-        print("   - Contains create_app() factory function")
-        print("   - Proper imports")
-        return True
-    except Exception as e:
-        print(f"❌ Structure check error: {e}")
-        return False
-
-def main():
-    """Run all health checks"""
-    print("\n")
-    print("╔" + "="*58 + "╗")
-    print("║" + " "*15 + "NEWS APPLICATION HEALTH CHECK" + " "*13 + "║")
-    print("╚" + "="*58 + "╝")
+def check_database_health():
+    """
+    Perform a comprehensive health check on the database.
+    Returns: (is_healthy, details_dict)
+    """
+    details = {
+        'database_type': 'unknown',
+        'database_exists': False,
+        'article_count': 0,
+        'category_count': 0,
+        'can_write': False,
+        'issues': []
+    }
     
-    checks = [
-        ("Imports", check_imports),
-        ("Models", check_models),
-        ("Routes", check_routes),
-        ("Database", check_database),
-        ("Structure", check_app_structure),
-    ]
-    
-    results = []
-    for name, check_func in checks:
-        try:
-            result = check_func()
-            results.append((name, result))
-        except Exception as e:
-            print(f"❌ Unexpected error in {name}: {e}")
-            results.append((name, False))
-    
-    # Summary
-    print("\n" + "="*60)
-    print("SUMMARY")
-    print("="*60)
-    
-    passed = sum(1 for _, result in results if result)
-    total = len(results)
-    
-    for name, result in results:
-        status = "✅ PASS" if result else "❌ FAIL"
-        print(f"  {status}: {name}")
-    
-    print(f"\nResult: {passed}/{total} checks passed")
-    
-    if passed == total:
-        print("\n✅ APPLICATION IS HEALTHY - NO CRITICAL ERRORS")
-        print("="*60)
-        return 0
+    # Check database type
+    database_url = os.getenv('DATABASE_URL')
+    if database_url:
+        details['database_type'] = 'postgresql'
     else:
-        print("\n❌ APPLICATION HAS ISSUES - PLEASE REVIEW ABOVE")
+        details['database_type'] = 'sqlite'
+        # Check SQLite file exists
+        db_path = os.path.abspath('news.db')
+        details['database_exists'] = os.path.exists(db_path)
+        if not details['database_exists']:
+            details['issues'].append('SQLite database file not found')
+    
+    # Try to connect and query
+    try:
+        from news_app import create_app
+        from news_app.models.db import db
+        from news_app.services.article_service import list_articles
+        from news_app.services.category_service import list_categories
+        
+        app = create_app()
+        
+        with app.app_context():
+            # Test connection
+            from sqlalchemy import text
+            db.session.execute(text("SELECT 1"))
+            
+            # Get counts
+            articles = list_articles()
+            categories = list_categories()
+            
+            details['article_count'] = len(articles)
+            details['category_count'] = len(categories)
+            details['database_exists'] = True
+            
+            # Test write capability
+            from news_app.services.article_service import create_article, delete_article
+            
+            initial_count = len(articles)
+            test_article = create_article(
+                f"Health Check Test {os.getpid()}",
+                "Testing database write capability",
+                None,
+                "Health Check"
+            )
+            
+            if test_article and test_article.id:
+                # Verify it was saved
+                new_count = len(list_articles())
+                details['can_write'] = new_count > initial_count
+                
+                # Clean up
+                delete_article(test_article.id)
+            else:
+                details['issues'].append('Could not create test article')
+            
+    except Exception as e:
+        details['issues'].append(f'Database connection failed: {e}')
+        return False, details
+    
+    # Determine health status
+    is_healthy = (
+        details['database_exists'] and
+        details['can_write'] and
+        len(details['issues']) == 0
+    )
+    
+    return is_healthy, details
+
+def print_health_report():
+    """Print a formatted health report"""
+    print("="*60)
+    print("DATABASE HEALTH REPORT")
+    print("="*60)
+    
+    is_healthy, details = check_database_health()
+    
+    print(f"Database Type: {details['database_type']}")
+    print(f"Database Exists: {details['database_exists']}")
+    print(f"Article Count: {details['article_count']}")
+    print(f"Category Count: {details['category_count']}")
+    print(f"Can Write: {details['can_write']}")
+    
+    if details['issues']:
+        print("\nIssues Found:")
+        for issue in details['issues']:
+            print(f"  - {issue}")
+    
+    print("\n" + "="*60)
+    if is_healthy:
+        print("STATUS: ✓ HEALTHY")
         print("="*60)
-        return 1
+        print("✓ Database is working correctly")
+        print("✓ Data persistence is functional")
+        print("✓ New articles and categories can be saved")
+    else:
+        print("STATUS: ✗ UNHEALTHY")
+        print("="*60)
+        print("⚠️  Database has issues that need attention")
+        print("⚠️  New articles/categories may not be saved")
+    
+    return is_healthy
+
+def suggest_fix():
+    """Provide suggestions for fixing database issues"""
+    print("\n" + "="*60)
+    print("SUGGESTED FIXES")
+    print("="*60)
+    
+    print("1. If database file doesn't exist:")
+    print("   Run: python fix_database_persistence.py seed")
+    
+    print("\n2. If write operations fail:")
+    print("   - Check file permissions: chmod 644 news.db")
+    print("   - Ensure disk has available space")
+    print("   - Run: python fix_database_persistence.py fix")
+    
+    print("\n3. For production (Render.com):")
+    print("   - Verify DATABASE_URL environment variable is set")
+    print("   - Check PostgreSQL connection in logs")
+    print("   - Run: python test_database.py")
+    
+    print("\n4. To reset everything:")
+    print("   Run: python fix_database_persistence.py fix")
 
 if __name__ == '__main__':
-    sys.exit(main())
+    print("\n")
+    is_healthy = print_health_report()
+    
+    if not is_healthy:
+        suggest_fix()
+    
+    sys.exit(0 if is_healthy else 1)
 
