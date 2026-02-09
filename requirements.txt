@@ -4,7 +4,7 @@ Flask-SQLAlchemy>=2.4
 
 # Database
 SQLAlchemy>=1.3
-psycopg2-binary>=2.9  # PostgreSQL adapter for production
+# Using SQLite only (no PostgreSQL)
 
 # HTTP Requests
 requests>=2.0

@@ -17,29 +17,25 @@ def create_app():
     mimetypes.add_type('text/css', '.css')
     mimetypes.add_type('application/javascript', '.js')
     
-    # Configure database - PostgreSQL for production, SQLite for development
-    database_url = os.getenv('DATABASE_URL')
-    if database_url:
-        # Production: Use PostgreSQL from Render.com
-        if database_url.startswith('postgres://'):
-            # Fix for newer SQLAlchemy versions
-            database_url = database_url.replace('postgres://', 'postgresql://', 1)
-        app.config['SQLALCHEMY_DATABASE_URI'] = database_url
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-            'pool_pre_ping': True,
-            'pool_recycle': 300,
-        }
-        print(f"[INFO] Using PostgreSQL database for production")
-    else:
-        # Development: Use SQLite
-        db_path = os.path.abspath('news.db')
-        app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
-        app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
-            'connect_args': {'timeout': 15, 'check_same_thread': False},
-            'pool_pre_ping': True,
-        }
-        print(f"[INFO] Using SQLite database for development: {db_path}")
+    # Configure SQLite database
+    # Use persistent disk path on Render, local path for development
+    disk_mount_path = os.getenv('DISK_MOUNT_PATH', '/opt/render/project/src')
     
+    # Check if we're on Render (persistent disk exists)
+    if os.path.exists(disk_mount_path):
+        # Production: Use persistent disk for SQLite database
+        db_path = os.path.join(disk_mount_path, 'news.db')
+        print(f"[INFO] Using SQLite database on persistent disk: {db_path}")
+    else:
+        # Development: Use local file in project directory
+        db_path = os.path.abspath('news.db')
+        print(f"[INFO] Using local SQLite database: {db_path}")
+    
+    app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{db_path}'
+    app.config['SQLALCHEMY_ENGINE_OPTIONS'] = {
+        'connect_args': {'timeout': 15, 'check_same_thread': False},
+        'pool_pre_ping': True,
+    }
     app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
     app.config['SECRET_KEY'] = os.getenv('SECRET_KEY', 'dev-secret')
 

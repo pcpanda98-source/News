@@ -3,6 +3,19 @@
 {% block title %}My Bookmarks - News Management System{% endblock %}
 
 {% block content %}
+{% set bookmarked_ids = [] %}
+<script>
+    // Store bookmarked IDs in a global variable for server-side filtering
+    var bookmarkedArticleIds = [];
+    try {
+        var saved = localStorage.getItem('news_bookmarks');
+        if (saved) {
+            bookmarkedArticleIds = JSON.parse(saved);
+        }
+    } catch (e) {
+        console.error('Error loading bookmarks:', e);
+    }
+</script>
 <div class="mb-8 slide-in-left flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
     <div>
         <h1 class="text-4xl font-bold text-gray-900 mb-4 flex items-center gap-3">
@@ -181,11 +194,23 @@
 <script>
 // Initialize bookmarks on page load
 document.addEventListener('DOMContentLoaded', function() {
-    // Update bookmark count
-    updateBookmarkCount();
-    
-    // Remove articles that are no longer bookmarked
-    filterVisibleBookmarks();
+    // Ensure Store is initialized and bookmarks are loaded
+    if (typeof Store !== 'undefined') {
+        Store.loadBookmarks();
+        
+        // Update bookmark count
+        updateBookmarkCount();
+        
+        // Remove articles that are no longer bookmarked
+        filterVisibleBookmarks();
+    } else {
+        // Fallback: retry after a short delay if Store is not yet loaded
+        setTimeout(function() {
+            Store.loadBookmarks();
+            updateBookmarkCount();
+            filterVisibleBookmarks();
+        }, 100);
+    }
 });
 
 // Update the bookmark count display
@@ -204,8 +229,13 @@ function filterVisibleBookmarks() {
         var articleId = card.getAttribute('data-id');
         if (!Store.isBookmarked(articleId)) {
             card.style.display = 'none';
+        } else {
+            card.style.display = ''; // Show bookmarked articles
         }
     });
+    
+    // Check if all cards are hidden and show empty state
+    checkEmptyState();
 }
 
 // Toggle bookmark for an article

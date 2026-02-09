@@ -49,3 +49,9 @@ def delete_article(article_id):
     reorder_article_ids()
     return True
 
+def get_articles_by_ids(article_ids):
+    """Get articles filtered by a list of IDs"""
+    if not article_ids:
+        return []
+    return Article.query.filter(Article.id.in_(article_ids)).order_by(Article.created_at.desc()).all()
+

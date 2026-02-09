@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
-from ..services.article_service import list_articles, list_articles_by_category, get_article, create_article, update_article, delete_article
+from ..services.article_service import list_articles, list_articles_by_category, get_article, create_article, update_article, delete_article, get_articles_by_ids
 from ..services.category_service import list_categories, get_category
 
 article_bp = Blueprint('articles', __name__, template_folder='templates')

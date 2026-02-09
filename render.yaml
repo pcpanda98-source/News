@@ -5,10 +5,6 @@ services:
     buildCommand: pip install -r requirements.txt && python render_deploy.py
     startCommand: gunicorn news_app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
     envVars:
-      - key: DATABASE_URL
-        fromDatabase:
-          name: news-db
-          property: connectionString
       - key: NEWS_API_KEY
         fromSecret: news-api-key
       - key: FLASK_ENV
@@ -19,12 +15,11 @@ services:
         value: /opt/render/project/src
     disk:
       name: media-storage
-      mountPath: /opt/render/project/src/static/uploads
+      mountPath: /opt/render/project/src
       sizeGB: 1
+      # SQLite database (news.db) and uploads folder will both persist here
 
 databases:
-  - name: news-db
-    plan: free
-    databaseName: news
-    user: news
+  # Using SQLite database on persistent disk instead of PostgreSQL
+  # Database file: /opt/render/project/src/news.db
 
