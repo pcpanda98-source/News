@@ -5,6 +5,7 @@ const Store = (function(){
     categories: [],
     currentUser: null,
     notifications: [],
+    bookmarks: [], // Bookmarked article IDs
     filters: {
       searchTerm: '',
       selectedCategory: null,
@@ -125,6 +126,83 @@ const Store = (function(){
     removeNotification(id) {
       const currentNotifications = state.notifications || [];
       this.set('notifications', currentNotifications.filter(n => n.id !== id));
+    },
+
+    // ============ BOOKMARK FUNCTIONS ============
+    
+    // Load bookmarks from localStorage
+    loadBookmarks() {
+      try {
+        const saved = localStorage.getItem('news_bookmarks');
+        if (saved) {
+          const bookmarks = JSON.parse(saved);
+          state.bookmarks = bookmarks;
+        }
+      } catch (error) {
+        console.error('Error loading bookmarks:', error);
+        state.bookmarks = [];
+      }
+    },
+
+    // Save bookmarks to localStorage
+    saveBookmarks() {
+      try {
+        localStorage.setItem('news_bookmarks', JSON.stringify(state.bookmarks));
+      } catch (error) {
+        console.error('Error saving bookmarks:', error);
+      }
+    },
+
+    // Check if an article is bookmarked
+    isBookmarked(articleId) {
+      return state.bookmarks.includes(parseInt(articleId));
+    },
+
+    // Toggle bookmark for an article
+    toggleBookmark(articleId) {
+      const id = parseInt(articleId);
+      const index = state.bookmarks.indexOf(id);
+      
+      if (index === -1) {
+        // Add to bookmarks
+        state.bookmarks.push(id);
+        this.saveBookmarks();
+        this.addNotification('Article bookmarked!', 'success', 2000);
+        return true; // Now bookmarked
+      } else {
+        // Remove from bookmarks
+        state.bookmarks.splice(index, 1);
+        this.saveBookmarks();
+        this.addNotification('Bookmark removed', 'info', 2000);
+        return false; // No longer bookmarked
+      }
+    },
+
+    // Get all bookmarked articles
+    getBookmarkedArticles() {
+      return state.articles.filter(article => state.bookmarks.includes(article.id));
+    },
+
+    // Remove bookmark
+    removeBookmark(articleId) {
+      const id = parseInt(articleId);
+      const index = state.bookmarks.indexOf(id);
+      if (index !== -1) {
+        state.bookmarks.splice(index, 1);
+        this.saveBookmarks();
+      }
+    },
+
+    // Clear all bookmarks
+    clearBookmarks() {
+      state.bookmarks = [];
+      this.saveBookmarks();
+      this.addNotification('All bookmarks cleared', 'info', 2000);
+    },
+
+    // Get bookmark count
+    getBookmarkCount() {
+      return state.bookmarks.length;
     }
   };
 })();
@@ -135,6 +213,7 @@ window.Store = Store;
 // Initialize on document ready
 document.addEventListener('DOMContentLoaded', () => {
   // Load initial data
+  Store.loadBookmarks(); // Load bookmarks first
   Store.loadArticles();
   Store.loadCategories();
 

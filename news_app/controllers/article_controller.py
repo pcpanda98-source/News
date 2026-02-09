@@ -67,6 +67,14 @@ def live_feed():
     return render_template('live_news.html', news_api_key=news_api_key)
 
 
+@article_bp.route('/bookmarks')
+def bookmarks_page():
+    """Show user's bookmarked articles"""
+    articles = list_articles()
+    categories = list_categories()
+    return render_template('bookmarks.html', articles=articles, categories=categories)
+
+
 @article_bp.route('/articles/create', methods=['GET', 'POST'])
 def create_article_page():
     categories = list_categories()

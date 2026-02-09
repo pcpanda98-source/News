@@ -13,17 +13,36 @@
     <article class="bg-white rounded-lg shadow-lg overflow-hidden card-hover-lift">
         <!-- Hero Image -->
         {% if article.image_url %}
-        <div class="h-64 overflow-hidden zoom-hover">
+        <div class="h-64 overflow-hidden zoom-hover relative">
             <img 
                 src="{{ article.image_url }}" 
                 alt="{{ article.title }}"
                 class="w-full h-full object-cover"
-                onerror="this.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-indigo-500 to-indigo-700 h-64 flex items-center justify-center\'><span class=\'text-8xl\'>📰</span></div>'"
             >
+            <!-- Bookmark Button -->
+            <button 
+                class="bookmark-btn-detail absolute top-4 right-4 w-12 h-12 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110"
+                title="Bookmark this article"
+                data-article-id="{{ article.id }}"
+            >
+                <svg class="bookmark-icon w-6 h-6 text-gray-400 hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+            </button>
         </div>
         {% else %}
-        <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-64 flex items-center justify-center zoom-subtle">
+        <div class="bg-gradient-to-r from-indigo-500 to-indigo-700 h-64 flex items-center justify-center zoom-subtle relative">
             <span class="text-8xl">📰</span>
+            <!-- Bookmark Button -->
+            <button 
+                class="bookmark-btn-detail absolute top-4 right-4 w-12 h-12 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 flex items-center justify-center shadow-lg transition-all duration-200 hover:scale-110"
+                title="Bookmark this article"
+                data-article-id="{{ article.id }}"
+            >
+                <svg class="bookmark-icon w-6 h-6 text-gray-400 hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+            </button>
         </div>
         {% endif %}
 
@@ -75,12 +94,16 @@
                     >
                         ← Back to Articles
                     </a>
-                    <a 
-                        href="/articles/create" 
-                        class="px-6 py-3 bg-indigo-600 text-white rounded-lg font-semibold hover:bg-gray-700 transition duration-200 hover:scale-105 transform text-center"
+                    <button 
+                        id="bookmarkDetailBtn"
+                        class="bookmark-btn-inline px-6 py-3 bg-yellow-500 text-white rounded-lg font-semibold hover:bg-yellow-600 transition duration-200 hover:scale-105 transform text-center flex items-center justify-center gap-2"
+                        data-article-id="{{ article.id }}"
                     >
-                        Create New Article
-                    </a>
+                        <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                        </svg>
+                        <span class="bookmark-label">Save Article</span>
+                    </button>
                 </div>
             </div>
         </div>
@@ -133,10 +156,88 @@
 {% endblock %}
 
 {% block scripts %}
+<script src="{{ url_for('static', filename='js/state.js') }}"></script>
 <script>
-document.addEventListener('DOMContentLoaded', () => {
+document.addEventListener('DOMContentLoaded', function() {
     // Analytics could be tracked here
     console.log('Article viewed:', document.querySelector('h1').textContent);
+    
+    // Update bookmark button based on current state
+    var articleId = '{{ article.id }}';
+    if (Store.isBookmarked(articleId)) {
+        // Update floating bookmark button
+        var floatBtn = document.querySelector('.bookmark-btn-detail');
+        if (floatBtn) {
+            var svg = floatBtn.querySelector('svg');
+            if (svg) {
+                svg.classList.remove('text-gray-400');
+                svg.classList.add('text-yellow-500');
+                svg.setAttribute('fill', 'currentColor');
+            }
+        }
+        
+        // Update inline bookmark button
+        var inlineBtn = document.getElementById('bookmarkDetailBtn');
+        if (inlineBtn) {
+            inlineBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            inlineBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+            var label = inlineBtn.querySelector('.bookmark-label');
+            if (label) {
+                label.textContent = 'Saved';
+            }
+        }
+    }
+    
+    // Add click event listeners to bookmark buttons
+    var bookmarkBtns = document.querySelectorAll('.bookmark-btn-detail, #bookmarkDetailBtn');
+    bookmarkBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var id = this.getAttribute('data-article-id');
+            toggleBookmark(id);
+        });
+    });
 });
+
+// Toggle bookmark for an article
+function toggleBookmark(articleId) {
+    var isNowBookmarked = Store.toggleBookmark(articleId);
+    
+    // Update floating bookmark button
+    var floatBtn = document.querySelector('.bookmark-btn-detail');
+    if (floatBtn) {
+        var svg = floatBtn.querySelector('svg');
+        if (svg) {
+            if (isNowBookmarked) {
+                svg.classList.remove('text-gray-400');
+                svg.classList.add('text-yellow-500');
+                svg.setAttribute('fill', 'currentColor');
+            } else {
+                svg.classList.remove('text-yellow-500');
+                svg.classList.add('text-gray-400');
+                svg.setAttribute('fill', 'none');
+            }
+        }
+    }
+    
+    // Update inline bookmark button
+    var inlineBtn = document.getElementById('bookmarkDetailBtn');
+    if (inlineBtn) {
+        var label = inlineBtn.querySelector('.bookmark-label');
+        if (isNowBookmarked) {
+            inlineBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+            inlineBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+            if (label) {
+                label.textContent = 'Saved';
+            }
+        } else {
+            inlineBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+            inlineBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+            if (label) {
+                label.textContent = 'Save Article';
+            }
+        }
+    }
+}
 </script>
 {% endblock %}

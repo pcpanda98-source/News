@@ -23,10 +23,18 @@
             {% endif %}
         </p>
     </div>
-    <a href="/manage" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-flex items-center space-x-2 h-fit shrink-0">
-        <span>⚙️</span>
-        <span>Manage News</span>
-    </a>
+    <div class="flex gap-2">
+        <a href="/manage" class="bg-indigo-600 text-white px-6 py-3 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 inline-flex items-center space-x-2 h-fit shrink-0">
+            <span>⚙️</span>
+            <span>Manage News</span>
+        </a>
+        <a href="/bookmarks" class="bg-yellow-500 text-white px-6 py-3 rounded-lg font-semibold hover:bg-yellow-600 transition duration-200 inline-flex items-center space-x-2 h-fit shrink-0">
+            <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+            </svg>
+            <span>My Bookmarks</span>
+        </a>
+    </div>
 </div>
 
 <!-- Active Category Badge -->
@@ -88,6 +96,7 @@
 <div id="articlesContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
 {% for article in articles %}
     <div class="article-card-modern bg-white rounded-xl shadow-md overflow-hidden article-card-animate tile-interactive" 
+         data-id="{{ article.id }}"
          data-title="{{ article.title|lower }}" 
          data-category="{{ article.category.name if article.category else ''|lower }}" 
          data-author="{{ article.author|lower if article.author else '' }}" 
@@ -99,7 +108,6 @@
                     src="{{ article.image_url }}" 
                     alt="{{ article.title }}"
                     class="w-full h-full object-cover"
-                    onerror="this.parentElement.parentElement.innerHTML='<div class=\'bg-gradient-to-r from-indigo-400 to-indigo-600 h-48 flex items-center justify-center\'><span class=\'text-6xl\'>📰</span></div>'"
                 >
             </div>
             {% else %}
@@ -107,8 +115,18 @@
                 <span class="text-6xl">📰</span>
             </div>
             {% endif %}
+            <!-- Bookmark Button -->
+            <button 
+                class="bookmark-btn absolute top-3 right-3 w-10 h-10 rounded-full bg-white bg-opacity-90 hover:bg-opacity-100 flex items-center justify-center shadow-md transition-all duration-200 hover:scale-110"
+                title="Bookmark this article"
+                data-article-id="{{ article.id }}"
+            >
+                <svg class="bookmark-icon w-5 h-5 text-gray-400 hover:text-yellow-500 transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                </svg>
+            </button>
             {% if article.category %}
-            <div class="absolute top-3 right-3 bg-indigo-100 text-indigo-800 text-xs px-3 py-1.5 rounded-full font-semibold badge-animate shadow-sm">
+            <div class="absolute top-3 left-3 bg-indigo-100 text-indigo-800 text-xs px-3 py-1.5 rounded-full font-semibold badge-animate shadow-sm">
                 {{ article.category.name }}
             </div>
             {% endif %}
@@ -137,15 +155,26 @@
                 </span>
             </div>
             
-            <a 
-                href="/articles/{{ article.id }}" 
-                class="inline-flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 hover:scale-105 transform w-full sm:w-auto"
-            >
-                Read Full Article
-                <svg class="w-4 h-4 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
-                </svg>
-            </a>
+            <div class="flex flex-col sm:flex-row gap-2">
+                <a 
+                    href="/articles/{{ article.id }}" 
+                    class="inline-flex items-center justify-center gap-2 bg-gray-600 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-gray-700 transition duration-200 hover:scale-105 transform flex-1"
+                >
+                    Read Full Article
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"></path>
+                    </svg>
+                </a>
+                <button 
+                    class="bookmark-btn-inline inline-flex items-center justify-center gap-2 bg-yellow-500 text-white px-4 py-2.5 rounded-lg font-semibold hover:bg-yellow-600 transition duration-200 hover:scale-105 transform flex-1"
+                    data-article-id="{{ article.id }}"
+                >
+                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M5 5a2 2 0 012-2h10a2 2 0 012 2v16l-7-3.5L5 21V5z"></path>
+                    </svg>
+                    <span class="bookmark-label">Save</span>
+                </button>
+            </div>
         </div>
     </div>
 {% endfor %}
@@ -187,27 +216,27 @@
 <script src="{{ url_for('static', filename='js/state.js') }}"></script>
 <script>
 // Get DOM elements
-const searchInput = document.getElementById('searchInput');
-const categoryFilter = document.getElementById('categoryFilter');
-const articlesContainer = document.getElementById('articlesContainer');
-const emptyState = document.getElementById('emptyState');
-const articleCount = document.getElementById('articleCount');
-const articleCards = document.querySelectorAll('.article-card-modern');
+var searchInput = document.getElementById('searchInput');
+var categoryFilter = document.getElementById('categoryFilter');
+var articlesContainer = document.getElementById('articlesContainer');
+var emptyState = document.getElementById('emptyState');
+var articleCount = document.getElementById('articleCount');
+var articleCards = document.querySelectorAll('.article-card-modern');
 
 // Filter articles function
 function filterArticles() {
-    const searchTerm = searchInput.value.toLowerCase().trim();
-    let visibleCount = 0;
+    var searchTerm = searchInput.value.toLowerCase().trim();
+    var visibleCount = 0;
 
-    articleCards.forEach(card => {
-        const title = card.getAttribute('data-title') || '';
-        const author = card.getAttribute('data-author') || '';
-        const content = card.getAttribute('data-content') || '';
+    articleCards.forEach(function(card) {
+        var title = card.getAttribute('data-title') || '';
+        var author = card.getAttribute('data-author') || '';
+        var content = card.getAttribute('data-content') || '';
         
-        const matchesSearch = !searchTerm || 
-            title.includes(searchTerm) || 
-            content.includes(searchTerm) ||
-            author.includes(searchTerm);
+        var matchesSearch = !searchTerm || 
+            title.indexOf(searchTerm) !== -1 || 
+            content.indexOf(searchTerm) !== -1 ||
+            author.indexOf(searchTerm) !== -1;
         
         if (matchesSearch) {
             card.style.display = 'block';
@@ -241,9 +270,9 @@ function resetFilters() {
 
 // Category filter with URL update
 function filterByCategory() {
-    const selectedCategory = categoryFilter.value;
+    var selectedCategory = categoryFilter.value;
     if (selectedCategory) {
-        window.location.href = `/articles?category=${encodeURIComponent(selectedCategory)}`;
+        window.location.href = '/articles?category=' + encodeURIComponent(selectedCategory);
     } else {
         window.location.href = '/articles';
     }
@@ -251,11 +280,13 @@ function filterByCategory() {
 
 // Debounce function
 function debounce(func, wait) {
-    let timeout;
-    return function executedFunction(...args) {
-        const later = () => {
-            clearTimeout(timeout);
-            func(...args);
+    var timeout;
+    return function executedFunction() {
+        var args = arguments;
+        var context = this;
+        var later = function() {
+            timeout = null;
+            func.apply(context, args);
         };
         clearTimeout(timeout);
         timeout = setTimeout(later, wait);
@@ -263,7 +294,7 @@ function debounce(func, wait) {
 }
 
 // Create debounced filter
-const debouncedFilter = debounce(filterArticles, 300);
+var debouncedFilter = debounce(filterArticles, 300);
 
 // Event listeners
 if (searchInput) {
@@ -273,9 +304,96 @@ if (categoryFilter) {
     categoryFilter.addEventListener('change', filterByCategory);
 }
 
-// Initialize on page load
+// Update all bookmark buttons based on current state
+function updateBookmarkButtons() {
+    var articleCards = document.querySelectorAll('.article-card-modern');
+    articleCards.forEach(function(card) {
+        var articleId = card.getAttribute('data-id');
+        if (Store.isBookmarked(articleId)) {
+            // Update floating bookmark button
+            var floatBtn = card.querySelector('.bookmark-btn');
+            if (floatBtn) {
+                var svg = floatBtn.querySelector('svg');
+                if (svg) {
+                    svg.classList.remove('text-gray-400');
+                    svg.classList.add('text-yellow-500');
+                    svg.setAttribute('fill', 'currentColor');
+                }
+            }
+            
+            // Update inline bookmark button
+            var inlineBtn = card.querySelector('.bookmark-btn-inline');
+            if (inlineBtn) {
+                inlineBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                inlineBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                var label = inlineBtn.querySelector('.bookmark-label');
+                if (label) {
+                    label.textContent = 'Saved';
+                }
+            }
+        }
+    });
+}
+
+// Toggle bookmark for an article
+function toggleBookmark(articleId) {
+    var isNowBookmarked = Store.toggleBookmark(articleId);
+    
+    // Find the card and update UI
+    var card = document.querySelector('.article-card-modern[data-id="' + articleId + '"]');
+    if (card) {
+        // Update floating bookmark button
+        var floatBtn = card.querySelector('.bookmark-btn');
+        if (floatBtn) {
+            var svg = floatBtn.querySelector('svg');
+            if (svg) {
+                if (isNowBookmarked) {
+                    svg.classList.remove('text-gray-400');
+                    svg.classList.add('text-yellow-500');
+                    svg.setAttribute('fill', 'currentColor');
+                } else {
+                    svg.classList.remove('text-yellow-500');
+                    svg.classList.add('text-gray-400');
+                    svg.setAttribute('fill', 'none');
+                }
+            }
+        }
+        
+        // Update inline bookmark button
+        var inlineBtn = card.querySelector('.bookmark-btn-inline');
+        if (inlineBtn) {
+            var label = inlineBtn.querySelector('.bookmark-label');
+            if (isNowBookmarked) {
+                inlineBtn.classList.remove('bg-yellow-500', 'hover:bg-yellow-600');
+                inlineBtn.classList.add('bg-gray-500', 'hover:bg-gray-600');
+                if (label) {
+                    label.textContent = 'Saved';
+                }
+            } else {
+                inlineBtn.classList.remove('bg-gray-500', 'hover:bg-gray-600');
+                inlineBtn.classList.add('bg-yellow-500', 'hover:bg-yellow-600');
+                if (label) {
+                    label.textContent = 'Save';
+                }
+            }
+        }
+    }
+}
+
+// Add click event listeners to bookmark buttons
 document.addEventListener('DOMContentLoaded', function() {
+    var bookmarkBtns = document.querySelectorAll('.bookmark-btn, .bookmark-btn-inline');
+    bookmarkBtns.forEach(function(btn) {
+        btn.addEventListener('click', function(e) {
+            e.preventDefault();
+            var articleId = this.getAttribute('data-article-id');
+            toggleBookmark(articleId);
+        });
+    });
+    
     filterArticles();
+    updateBookmarkButtons();
 });
 </script>
 {% endblock %}
+
