@@ -20,3 +20,6 @@ gunicorn>=21.0  # Required for Render deployment
 
 # Security
 Werkzeug>=2.0  # Provides secure_filename for file uploads
+
+# Performance Optimization
+Flask-Compress>=1.13  # Gzip/Brotli compression for responses

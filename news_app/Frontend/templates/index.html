@@ -57,7 +57,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path>
                 </svg>
             </div>
-            <div class="stat-value text-blue-600 mb-1 text-2xl font-bold">{{ articles|length }}</div>
+            <div class="stat-value text-blue-600 mb-1 text-2xl font-bold">{{ total_articles }}</div>
             <p class="stat-label text-gray-600 text-sm">Total Articles</p>
         </div>
         <div class="stat-card-modern bg-white rounded-xl shadow-md p-5 text-center stat-animate tile-interactive">
@@ -75,7 +75,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"></path>
                 </svg>
             </div>
-            <div class="stat-value text-purple-600 mb-1 text-2xl font-bold" id="todayCount">0</div>
+            <div class="stat-value text-purple-600 mb-1 text-2xl font-bold">{{ today_count }}</div>
             <p class="stat-label text-gray-600 text-sm">Today</p>
         </div>
         <div class="stat-card-modern bg-white rounded-xl shadow-md p-5 text-center stat-animate tile-interactive">
@@ -84,68 +84,12 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                 </svg>
             </div>
-            <div class="stat-value text-orange-600 mb-1 text-2xl font-bold" id="weekCount">0</div>
+            <div class="stat-value text-orange-600 mb-1 text-2xl font-bold">{{ week_count }}</div>
             <p class="stat-label text-gray-600 text-sm">This Week</p>
         </div>
     </div>
 </section>
 
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    // Count stats by iterating through articles in the DOM
-    function countStats() {
-        const articlesInDom = document.querySelectorAll('.article-card');
-        const today = new Date();
-        today.setHours(0, 0, 0, 0);
-        
-        const weekAgo = new Date(today);
-        weekAgo.setDate(weekAgo.getDate() - 7);
-        
-        let todayCount = 0;
-        let weekCount = 0;
-        
-        // Parse dates from article cards
-        articlesInDom.forEach(card => {
-            const dateSpan = card.querySelector('span');
-            if (dateSpan && dateSpan.textContent.includes(',')) {
-                const dateStr = dateSpan.textContent.trim();
-                const articleDate = new Date(dateStr);
-                if (!isNaN(articleDate)) {
-                    if (articleDate >= today) {
-                        todayCount++;
-                    }
-                    if (articleDate >= weekAgo) {
-                        weekCount++;
-                    }
-                }
-            }
-        });
-        
-        // Animate the counters
-        function animateCounter(element, target) {
-            let current = 0;
-            const increment = Math.max(1, Math.ceil(target / 20));
-            const timer = setInterval(() => {
-                current += increment;
-                if (current >= target) {
-                    current = target;
-                    clearInterval(timer);
-                }
-                element.textContent = current;
-            }, 40);
-        }
-        
-        const todayEl = document.getElementById('todayCount');
-        const weekEl = document.getElementById('weekCount');
-        
-        if (todayEl) animateCounter(todayEl, todayCount);
-        if (weekEl) animateCounter(weekEl, weekCount);
-    }
-    
-    // Run count stats
-    countStats();
-});
-</script>
 {% endblock %}
 
 {% block scripts %}

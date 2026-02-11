@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template, request, redirect, url_for, jsonify
-from ..services.article_service import list_articles, list_articles_by_category, get_article, create_article, update_article, delete_article, get_articles_by_ids
+from ..services.article_service import list_articles, list_articles_by_category, get_article, create_article, update_article, delete_article, get_articles_by_ids, count_articles, count_articles_today, count_articles_this_week
 from ..services.category_service import list_categories, get_category
 
 article_bp = Blueprint('articles', __name__, template_folder='templates')
@@ -8,15 +8,37 @@ article_bp = Blueprint('articles', __name__, template_folder='templates')
 @article_bp.route('/')
 def home():
     # show live news page is primary; but also show internal articles
-    articles = list_articles()
+    # Performance: Get paginated results for better performance
+    result = list_articles(page=1, per_page=8)
+    if isinstance(result, dict):
+        articles = result['items']
+        total_count = result['total']
+        total_pages = result['pages']
+    else:
+        articles = result
+        total_count = len(articles)
+        total_pages = 1
+    
     categories = list_categories()
-    return render_template('index.html', articles=articles, categories=categories)
+    
+    # Performance: Use efficient count functions instead of iterating
+    today_count = count_articles_today()
+    week_count = count_articles_this_week()
+    
+    return render_template('index.html', 
+                         articles=articles, 
+                         categories=categories,
+                         total_articles=total_count,
+                         today_count=today_count,
+                         week_count=week_count)
 
 
 @article_bp.route('/articles')
 def articles_page():
     category_param = request.args.get('category')
     search_term = request.args.get('search')
+    page = request.args.get('page', 1, type=int)
+    per_page = 12
     
     selected_category = ''
     
@@ -25,23 +47,53 @@ def articles_page():
         if category_param.isdigit():
             category = get_category(int(category_param))
             if category:
-                articles = list_articles_by_category(category.id)
+                result = list_articles_by_category(category.id, page=page, per_page=per_page)
+                if isinstance(result, dict):
+                    articles = result['items']
+                    pagination = result
+                else:
+                    articles = result
+                    pagination = None
                 selected_category = category.name
             else:
-                articles = list_articles()
+                result = list_articles(page=page, per_page=per_page)
+                if isinstance(result, dict):
+                    articles = result['items']
+                    pagination = result
+                else:
+                    articles = result
+                    pagination = None
                 selected_category = ''
         else:
             # Try to find category by name
             categories = list_categories()
             category = next((cat for cat in categories if cat.name == category_param), None)
             if category:
-                articles = list_articles_by_category(category.id)
+                result = list_articles_by_category(category.id, page=page, per_page=per_page)
+                if isinstance(result, dict):
+                    articles = result['items']
+                    pagination = result
+                else:
+                    articles = result
+                    pagination = None
                 selected_category = category.name
             else:
-                articles = list_articles()
+                result = list_articles(page=page, per_page=per_page)
+                if isinstance(result, dict):
+                    articles = result['items']
+                    pagination = result
+                else:
+                    articles = result
+                    pagination = None
                 selected_category = ''
     else:
-        articles = list_articles()
+        result = list_articles(page=page, per_page=per_page)
+        if isinstance(result, dict):
+            articles = result['items']
+            pagination = result
+        else:
+            articles = result
+            pagination = None
         selected_category = ''
     
     categories = list_categories()
@@ -49,13 +101,18 @@ def articles_page():
                          articles=articles, 
                          categories=categories, 
                          selected_category=selected_category,
-                         search_term=search_term or '')
+                         search_term=search_term or '',
+                         pagination=pagination)
 
 
 @article_bp.route('/latest')
 def latest_news():
     """Show latest created news articles with timestamps"""
-    articles = list_articles()
+    result = list_articles(page=1, per_page=20)
+    if isinstance(result, dict):
+        articles = result['items']
+    else:
+        articles = result
     categories = list_categories()
     return render_template('latest.html', articles=articles, categories=categories)
 

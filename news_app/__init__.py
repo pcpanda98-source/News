@@ -1,4 +1,5 @@
 from flask import Flask, send_from_directory, Response
+from flask_compress import Compress
 from .Backend.models.db import db
 from .Backend.controllers.article_controller import article_bp
 from .Backend.controllers.category_controller import category_bp
@@ -8,6 +9,9 @@ from .Backend.controllers.media_controller import media_bp
 import os
 import mimetypes
 
+# Initialize compression
+compress = Compress()
+
 def create_app():
     template_dir = os.path.join(os.path.dirname(__file__), 'Frontend', 'templates')
     static_dir = os.path.join(os.path.dirname(__file__), 'Frontend', 'static')
@@ -16,6 +20,16 @@ def create_app():
     # Ensure correct MIME types
     mimetypes.add_type('text/css', '.css')
     mimetypes.add_type('application/javascript', '.js')
+    
+    # Performance: Configure compression
+    app.config['COMPRESS_ENABLED'] = True
+    app.config['COMPRESS_MIN_SIZE'] = 500  # Only compress responses > 500 bytes
+    app.config['COMPRESS_BR_LEVEL'] = 6
+    app.config['COMPRESS_GZIP_LEVEL'] = 6
+    app.config['COMPRESS_EXCLUDE_PATHS'] = ['/static/uploads']  # Don't compress images
+    
+    # Initialize compression
+    compress.init_app(app)
     
     # Configure SQLite database
     # Use persistent disk path on Render, local path for development
