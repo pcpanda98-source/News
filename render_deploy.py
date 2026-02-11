@@ -6,10 +6,10 @@ Ensures database seeding and media upload functionality work correctly
 import os
 import sys
 from news_app import create_app
-from news_app.models.db import db
-from news_app.services.category_service import create_category, list_categories
-from news_app.services.article_service import create_article, list_articles
-from news_app.services.media_service import list_media
+from news_app.Backend.models.db import db
+from news_app.Backend.services.category_service import create_category, list_categories
+from news_app.Backend.services.article_service import create_article, list_articles
+from news_app.Backend.services.media_service import list_media
 
 def setup_media_directories():
     """Setup media upload directories for both local and Render.com"""

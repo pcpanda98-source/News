@@ -3,7 +3,7 @@ services:
     name: news-app
     env: python
     buildCommand: pip install -r requirements.txt && python render_deploy.py
-    startCommand: gunicorn news_app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
+    startCommand: gunicorn app:app --timeout 120 --workers 1 --bind 0.0.0.0:$PORT
     envVars:
       - key: NEWS_API_KEY
         fromSecret: news-api-key
@@ -13,14 +13,8 @@ services:
         value: /opt/render/project/src
       - key: DISK_MOUNT_PATH
         value: /opt/render/project/src
-      # NOTE: DATABASE_SEEDED is set by render_deploy.py after initial seeding
     disk:
       name: media-storage
       mountPath: /opt/render/project/src
       sizeGB: 1
-      # SQLite database (news.db) and uploads folder will both persist here
-
-databases:
-  # Using SQLite database on persistent disk instead of PostgreSQL
-  # Database file: /opt/render/project/src/news.db
 
