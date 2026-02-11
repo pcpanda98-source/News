@@ -253,8 +253,8 @@
 
 /* Enhanced hover effects */
 .category-card:hover {
-    transform: translateY(-8px) scale(1.05);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+    transform: none;
+    box-shadow: none;
 }
 
 .article-card:hover {
@@ -263,8 +263,8 @@
 }
 
 .stat-card:hover {
-    transform: translateY(-2px) scale(1.02);
-    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+    transform: none;
+    box-shadow: none;
 }
 
 /* Keyframes */
@@ -2741,31 +2741,6 @@ body.page-loading {
 .tile-interactive {
     position: relative;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.tile-interactive::before {
-    content: '';
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-    height: 4px;
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6, #ec4899);
-    transform: scaleX(0);
-    transform-origin: left;
-    transition: transform 0.4s ease;
-}
-
-.tile-interactive:hover::before {
-    transform: scaleX(1);
-}
-
-.tile-interactive:hover {
-    transform: translateY(-6px);
-    box-shadow: 
-        0 15px 30px rgba(0, 0, 0, 0.12),
-        0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 /* Card with corner accent */
@@ -2864,27 +2839,6 @@ body.page-loading {
     background: linear-gradient(135deg, var(--card-bg) 0%, var(--bg-secondary) 100%);
     border-radius: 1rem;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.category-card-modern::after {
-    content: '';
-    position: absolute;
-    inset: 0;
-    background: linear-gradient(135deg, rgba(139, 92, 246, 0.1), rgba(59, 130, 246, 0.1));
-    opacity: 0;
-    transition: opacity 0.4s ease;
-}
-
-.category-card-modern:hover::after {
-    opacity: 1;
-}
-
-.category-card-modern:hover {
-    transform: translateY(-6px) scale(1.02);
-    box-shadow: 
-        0 20px 40px rgba(139, 92, 246, 0.2),
-        0 10px 20px rgba(59, 130, 246, 0.1);
 }
 
 /* Stat card modern */
@@ -2894,29 +2848,6 @@ body.page-loading {
     border-radius: 1rem;
     padding: 1.5rem;
     overflow: hidden;
-    transition: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
-}
-
-.stat-card-modern::before {
-    content: '';
-    position: absolute;
-    top: -50%;
-    right: -50%;
-    width: 100%;
-    height: 100%;
-    background: radial-gradient(circle, rgba(59, 130, 246, 0.1) 0%, transparent 70%);
-    transition: transform 0.4s ease;
-}
-
-.stat-card-modern:hover::before {
-    transform: scale(1.5);
-}
-
-.stat-card-modern:hover {
-    transform: translateY(-4px);
-    box-shadow: 
-        0 15px 30px rgba(59, 130, 246, 0.15),
-        0 5px 15px rgba(0, 0, 0, 0.08);
 }
 
 .stat-card-modern .stat-icon {
